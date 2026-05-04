@@ -3,7 +3,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'turfpro-secret-change-in-production-xk92pla'
-DEBUG = True
+# DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -55,10 +56,24 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'turf_project.wsgi.application'
 
-DATABASES = {'default': {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': BASE_DIR / 'db.sqlite3',
-}}
+
+# LIVE DATABASE
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'turf_db',
+        'USER': 'turf_user',
+        'PASSWORD': 'turf@12345',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+
+# DEVELOPMENT DATABASE
+# DATABASES = {'default': {
+#     'ENGINE': 'django.db.backends.sqlite3',
+#     'NAME': BASE_DIR / 'db.sqlite3',
+# }}
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
