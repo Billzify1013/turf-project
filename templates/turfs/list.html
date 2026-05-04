@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}My Turfs — TurfPro{% endblock %}
+{% block page_title %}My Turfs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="ph-left"><div class="ph-title">My Turfs</div><div class="ph-sub">Manage your venues</div></div>
+  <button class="btn btn-primary btn-sm" onclick="openModal('addTurf')"><i class="bi bi-plus-lg"></i> Add Turf</button>
+</div>
+<div class="grid-3">
+  {% for t in turfs %}
+  <div class="card" style="padding:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+      <div>
+        <div class="fw-700" style="font-size:1rem; color:var(--text);">{{ t.name }}</div>
+        <div class="text-muted fs-13">{{ t.sport_type }}</div>
+      </div>
+      <span class="badge {% if t.is_active %}badge-booked{% else %}badge-cancelled{% endif %}">{% if t.is_active %}Active{% else %}Inactive{% endif %}</span>
+    </div>
+    {% if t.location %}<div class="fs-13 text-muted mb-12"><i class="bi bi-geo-alt"></i> {{ t.location }}</div>{% endif %}
+    <div class="grid-2" style="gap:8px; margin-bottom:14px;">
+      <div style="background:var(--bg); border-radius:8px; padding:8px 10px;">
+        <div class="fs-12 text-muted">Default Price</div>
+        <div class="fw-700 text-primary">₹{{ t.default_price_per_hour }}/hr</div>
+      </div>
+      <div style="background:var(--bg); border-radius:8px; padding:8px 10px;">
+        <div class="fs-12 text-muted">Open Hours</div>
+        <div class="fw-700 fs-13">{{ t.open_time|time:"g:i A" }} – {{ t.close_time|time:"g:i A" }}</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:6px;">
+      <a href="{% url 'booking_create' %}?turf={{ t.id }}" class="btn btn-primary btn-sm" style="flex:1; justify-content:center;"><i class="bi bi-plus-lg"></i> Book</a>
+      <button onclick="editTurf({{ t.id }}, '{{ t.name|escapejs }}', '{{ t.sport_type }}', '{{ t.location|escapejs }}', '{{ t.open_time|time:'H:i' }}', '{{ t.close_time|time:'H:i' }}', '{{ t.default_price_per_hour }}')" class="btn btn-ghost btn-sm"><i class="bi bi-pencil"></i></button>
+    </div>
+  </div>
+  {% empty %}
+  <div style="grid-column:1/-1;">
+    <div class="card"><div class="empty-state">
+      <div class="ei">🏟️</div>
+      <p>No turfs yet. Add your first turf to get started!</p>
+      <button class="btn btn-primary btn-sm" onclick="openModal('addTurf')"><i class="bi bi-plus-lg"></i> Add First Turf</button>
+    </div></div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Add/Edit Turf Modal -->
+<div class="modal-overlay" id="modal-addTurf">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header"><span class="modal-title" id="turfModalTitle">Add Turf</span><button class="modal-close" onclick="closeModal('addTurf')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editTurfId">
+      <div class="grid-2">
+        <div class="form-group"><label>Turf Name *</label><input type="text" class="form-control" id="tName" placeholder="e.g. Ground A"></div>
+        <div class="form-group"><label>Sport Type</label>
+          <select class="form-control" id="tSport">
+            <option>Football</option><option>Cricket</option><option>Basketball</option><option>Badminton</option><option>Tennis</option><option>Multi-Sport</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Location</label><input type="text" class="form-control" id="tLocation" placeholder="Address or area"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Open Time</label><input type="time" class="form-control" id="tOpen" value="06:00"></div>
+        <div class="form-group"><label>Close Time</label><input type="time" class="form-control" id="tClose" value="23:00"></div>
+      </div>
+      <div class="form-group"><label>Default Price / Hour (₹)</label><input type="number" class="form-control" id="tPrice" value="800"></div>
+      <div class="form-group"><label>Description</label><textarea class="form-control" id="tDesc" rows="2" placeholder="Optional"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addTurf')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTurf()"><i class="bi bi-check-lg"></i> Save Turf</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function openModal(id){document.getElementById('modal-'+id).classList.add('open');}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('open');}
+function editTurf(id, name, sport, loc, open, close, price) {
+  document.getElementById('editTurfId').value = id;
+  document.getElementById('tName').value = name;
+  document.getElementById('tSport').value = sport;
+  document.getElementById('tLocation').value = loc;
+  document.getElementById('tOpen').value = open;
+  document.getElementById('tClose').value = close;
+  document.getElementById('tPrice').value = price;
+  document.getElementById('turfModalTitle').textContent = 'Edit Turf';
+  openModal('addTurf');
+}
+function saveTurf() {
+  const fd = new FormData();
+  const eid = document.getElementById('editTurfId').value;
+  if(eid) fd.append('turf_id', eid);
+  fd.append('name', document.getElementById('tName').value);
+  fd.append('sport_type', document.getElementById('tSport').value);
+  fd.append('location', document.getElementById('tLocation').value);
+  fd.append('open_time', document.getElementById('tOpen').value);
+  fd.append('close_time', document.getElementById('tClose').value);
+  fd.append('default_price', document.getElementById('tPrice').value);
+  fd.append('description', document.getElementById('tDesc').value);
+  fd.append('csrfmiddlewaretoken', getCsrf());
+  fetch('/turfs/save/', {method:'POST', body:fd}).then(r=>r.json()).then(d=>{
+    if(d.success){showToast('Turf saved!','success');setTimeout(()=>location.reload(),700);}
+    else showToast(d.error,'error');
+  });
+}
+</script>
+{% endblock %}

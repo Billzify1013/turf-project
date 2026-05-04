@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% block title %}Pricing Rules — TurfPro{% endblock %}
+{% block page_title %}Pricing Rules{% endblock %}
+
+{% block extra_head %}
+<style>
+.price-type-toggle {
+  display: flex;
+  gap: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 4px;
+  margin-bottom: 12px;
+}
+.ptt-btn {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text2);
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.ptt-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.overnight-hint {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 12px;
+  display: none;
+}
+.overnight-hint.show { display: block; }
+[data-theme="dark"] .overnight-hint { background: rgba(3,105,161,.15); border-color: rgba(3,105,161,.3); color: #7dd3fc; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="ph-left">
+    <div class="ph-title">Dynamic Pricing</div>
+    <div class="ph-sub">Hour, day, and date-based pricing rules</div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="openRuleModal()"><i class="bi bi-plus-lg"></i> Add Rule</button>
+</div>
+
+<div class="card mb-16" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color:#bbf7d0;">
+  <div class="card-body">
+    <div style="font-weight:700; color:#15803d; margin-bottom:8px; font-size:13.5px;">⚡ How Dynamic Pricing Works</div>
+    <div style="font-size:13px; color:#166534; line-height:1.8;">
+      <strong>Priority:</strong> Specific Date &gt; Day of Week &gt; Time-only rules &gt; Default price<br>
+      <strong>Overnight rules</strong> work too — set start 5 PM and end 6 AM to cover the whole night.<br>
+      Time is split into 15-min blocks, each block uses the best matching rule.
+    </div>
+  </div>
+</div>
+
+<div class="card mb-16">
+  <div class="card-body">
+    <form method="get" style="display:flex; gap:8px; align-items:flex-end;">
+      <div style="min-width:180px;">
+        <div class="form-label">Filter by Turf</div>
+        <select name="turf" class="form-control" onchange="this.form.submit()">
+          <option value="">All Turfs</option>
+          {% for t in turfs %}<option value="{{ t.id }}" {% if turf_f == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
+        </select>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="tp-table">
+      <thead>
+        <tr><th>Turf</th><th>Rule Name</th><th>Applies To</th><th>Time Slot</th><th>Price/hr</th><th>Multiplier</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for r in rules %}
+        <tr>
+          <td class="fw-600">{{ r.turf.name }}</td>
+          <td>{{ r.name|default:"—" }}</td>
+          <td>
+            {% if r.specific_date %}<span class="badge badge-cancelled">📅 {{ r.specific_date|date:"d M Y" }}</span>
+            {% elif r.day_of_week is not None %}<span class="badge badge-hold">📆 {{ r.get_day_of_week_display }}</span>
+            {% else %}<span class="badge badge-booked">⏰ Any Day</span>{% endif %}
+          </td>
+          <td class="text-muted">
+            {{ r.start_time|time:"g:i A" }} – {{ r.end_time|time:"g:i A" }}
+            {% if r.end_time <= r.start_time %}<span style="color:#c2410c; font-weight:700; font-size:10.5px;"> (overnight)</span>{% endif %}
+          </td>
+          <td>{% if r.price_per_hour %}<span class="text-primary fw-700">₹{{ r.price_per_hour|floatformat:0 }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+          <td>{% if r.multiplier %}<span style="color:#2563eb; font-weight:700;">×{{ r.multiplier }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+          <td>
+            <div style="display:flex; gap:4px;">
+              <button onclick="editRule('{{ r.id }}', '{{ r.turf.id }}', '{{ r.name|escapejs }}', '{{ r.day_of_week|default_if_none:'' }}', '{{ r.specific_date|date:'Y-m-d'|default:'' }}', '{{ r.start_time|time:'H:i' }}', '{{ r.end_time|time:'H:i' }}', '{{ r.price_per_hour|default_if_none:'' }}', '{{ r.multiplier|default_if_none:'' }}')" class="btn btn-ghost btn-sm" title="Edit"><i class="bi bi-pencil"></i></button>
+              <button onclick="deleteRule({{ r.id }})" class="btn btn-danger btn-sm" title="Delete"><i class="bi bi-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state" style="padding:32px;"><div class="ei">🏷️</div><p>No pricing rules yet. The default price set on each turf will be used.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Rule Modal -->
+<div class="modal-overlay" id="ruleModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Add Pricing Rule</span>
+      <button class="modal-close" onclick="closeRuleModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ruleId">
+      <div class="form-group">
+        <label>Turf *</label>
+        <select class="form-control" id="rTurf">
+          {% for t in turfs %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rule Name</label>
+        <input type="text" class="form-control" id="rName" placeholder="e.g. Evening Prime, Weekend, Holiday">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Day of Week</label>
+          <select class="form-control" id="rDay">
+            <option value="">Any Day</option>
+            <option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option>
+            <option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Specific Date (overrides day)</label>
+          <div style="display:flex; gap:6px; align-items:stretch;">
+            <input type="date" class="form-control" id="rDate" style="flex:1;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="clearDateField()" title="Clear date" style="padding:0 12px;">
+              <i class="bi bi-x-lg"></i> Clear
+            </button>
+          </div>
+          <div class="fs-12 text-muted mt-4">Leave empty to apply rule on Day of Week instead.</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Start Time *</label>
+          <input type="time" class="form-control" id="rStart" onchange="checkOvernight()">
+        </div>
+        <div class="form-group">
+          <label>End Time *</label>
+          <input type="time" class="form-control" id="rEnd" onchange="checkOvernight()">
+        </div>
+      </div>
+
+      <div class="overnight-hint" id="overnightHint">
+        ℹ️ This is an <strong>overnight rule</strong> (end is on next day). Will apply continuously through midnight.
+      </div>
+
+      <!-- ✅ Mutually exclusive price type toggle -->
+      <label class="form-label" style="margin-bottom:6px;">Pricing Method *</label>
+      <div class="price-type-toggle">
+        <button type="button" class="ptt-btn active" id="pttFixed" onclick="setPriceType('fixed')">💰 Fixed Price</button>
+        <button type="button" class="ptt-btn" id="pttMult" onclick="setPriceType('multiplier')">✖ Multiplier</button>
+      </div>
+
+      <div id="fixedPriceRow" class="form-group">
+        <label>Price per Hour (₹) *</label>
+        <input type="number" class="form-control" id="rPrice" placeholder="e.g. 1600" min="0">
+        <div class="fs-12 text-muted mt-4">Charges this exact ₹ per hour during the rule period.</div>
+      </div>
+
+      <div id="multiplierRow" class="form-group" style="display:none;">
+        <label>Multiplier *</label>
+        <input type="number" step="0.1" class="form-control" id="rMult" placeholder="e.g. 1.5" min="0">
+        <div class="fs-12 text-muted mt-4">Multiplies the turf's default rate. (1.5 = 50% extra, 0.8 = 20% off)</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeRuleModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRule()" id="saveRuleBtn"><i class="bi bi-check-lg"></i> Save Rule</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let priceType = 'fixed';
+
+function openRuleModal() {
+  // Reset to "add" mode
+  document.getElementById('modalTitle').textContent = 'Add Pricing Rule';
+  document.getElementById('ruleId').value = '';
+  document.getElementById('rTurf').value = '{{ turfs.0.id|default:"" }}';
+  document.getElementById('rName').value = '';
+  document.getElementById('rDay').value = '';
+  document.getElementById('rDate').value = '';
+  document.getElementById('rStart').value = '';
+  document.getElementById('rEnd').value = '';
+  document.getElementById('rPrice').value = '';
+  document.getElementById('rMult').value = '';
+  setPriceType('fixed');
+  document.getElementById('overnightHint').classList.remove('show');
+  document.getElementById('ruleModal').classList.add('open');
+}
+
+function closeRuleModal() {
+  document.getElementById('ruleModal').classList.remove('open');
+}
+
+function editRule(id, turfId, name, day, date, start, end, price, mult) {
+  document.getElementById('modalTitle').textContent = 'Edit Pricing Rule';
+  document.getElementById('ruleId').value = id;
+  document.getElementById('rTurf').value = turfId;
+  document.getElementById('rName').value = name;
+  document.getElementById('rDay').value = day;
+  document.getElementById('rDate').value = date;
+  document.getElementById('rStart').value = start;
+  document.getElementById('rEnd').value = end;
+
+  if (mult && mult !== 'None') {
+    setPriceType('multiplier');
+    document.getElementById('rMult').value = mult;
+    document.getElementById('rPrice').value = '';
+  } else {
+    setPriceType('fixed');
+    document.getElementById('rPrice').value = price && price !== 'None' ? price : '';
+    document.getElementById('rMult').value = '';
+  }
+  checkOvernight();
+  document.getElementById('ruleModal').classList.add('open');
+}
+
+function setPriceType(type) {
+  priceType = type;
+  document.getElementById('pttFixed').classList.toggle('active', type === 'fixed');
+  document.getElementById('pttMult').classList.toggle('active', type === 'multiplier');
+  document.getElementById('fixedPriceRow').style.display = type === 'fixed' ? 'block' : 'none';
+  document.getElementById('multiplierRow').style.display = type === 'multiplier' ? 'block' : 'none';
+  // Clear the other field when toggling
+  if (type === 'fixed') document.getElementById('rMult').value = '';
+  else document.getElementById('rPrice').value = '';
+}
+
+function checkOvernight() {
+  const s = document.getElementById('rStart').value;
+  const e = document.getElementById('rEnd').value;
+  const hint = document.getElementById('overnightHint');
+  if (s && e && e <= s) hint.classList.add('show');
+  else hint.classList.remove('show');
+}
+
+function saveRule() {
+  const turf = document.getElementById('rTurf').value;
+  const start = document.getElementById('rStart').value;
+  const end = document.getElementById('rEnd').value;
+  const price = document.getElementById('rPrice').value;
+  const mult = document.getElementById('rMult').value;
+
+  if (!turf) { showToast('Select a turf', 'error'); return; }
+  if (!start || !end) { showToast('Enter start and end time', 'error'); return; }
+  if (priceType === 'fixed' && !price) { showToast('Enter price per hour', 'error'); return; }
+  if (priceType === 'multiplier' && !mult) { showToast('Enter multiplier value', 'error'); return; }
+
+  const btn = document.getElementById('saveRuleBtn');
+  btn.disabled = true;
+  btn.innerHTML = 'Saving...';
+
+  const fd = new FormData();
+  fd.append('rule_id', document.getElementById('ruleId').value);
+  fd.append('turf_id', turf);
+  fd.append('name', document.getElementById('rName').value);
+  fd.append('day_of_week', document.getElementById('rDay').value);
+  fd.append('specific_date', document.getElementById('rDate').value);
+  fd.append('start_time', start);
+  fd.append('end_time', end);
+  fd.append('price_type', priceType);
+  // Only send the relevant value based on price type
+  if (priceType === 'fixed') {
+    fd.append('price_per_hour', price);
+    fd.append('multiplier', '');
+  } else {
+    fd.append('price_per_hour', '');
+    fd.append('multiplier', mult);
+  }
+  fd.append('csrfmiddlewaretoken', getCsrf());
+
+  fetch('/pricing/save/', { method: 'POST', body: fd })
+    .then(r => r.json()).then(d => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg"></i> Save Rule';
+      if (d.success) {
+        showToast('Rule saved!', 'success');
+        setTimeout(() => location.reload(), 700);
+      } else {
+        showToast(d.error || 'Save failed', 'error');
+      }
+    });
+}
+
+function deleteRule(id) {
+  if (!confirm('Delete this rule?')) return;
+  const fd = new FormData();
+  fd.append('csrfmiddlewaretoken', getCsrf());
+  fetch(`/pricing/${id}/delete/`, { method: 'POST', body: fd })
+    .then(r => r.json()).then(d => {
+      if (d.success) { showToast('Deleted', 'success'); setTimeout(() => location.reload(), 600); }
+    });
+}
+
+function clearDateField() {
+  document.getElementById('rDate').value = '';
+}
+</script>
+{% endblock %}

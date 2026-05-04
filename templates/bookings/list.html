@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Bookings — TurfPro{% endblock %}
+{% block page_title %}All Bookings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="ph-left">
+    <div class="ph-title">Bookings</div>
+    <div class="ph-sub">{{ date_from|date:"d M Y" }} – {{ date_to|date:"d M Y" }} &nbsp;·&nbsp; <strong>₹{{ total_rev|floatformat:0 }}</strong> collected</div>
+  </div>
+  <a href="{% url 'booking_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Booking</a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-16">
+  <div class="card-body">
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+      <input type="hidden" name="from" value="{{ date_from|date:'Y-m-d' }}">
+      <input type="hidden" name="to" value="{{ date_to|date:'Y-m-d' }}">
+      <div style="flex:1; min-width:160px;">
+        <div class="form-label">Search</div>
+        <input type="text" name="q" class="form-control" placeholder="Name or phone..." value="{{ filters.q }}">
+      </div>
+      <div style="min-width:130px;">
+        <div class="form-label">Status</div>
+        <select name="status" class="form-control">
+          <option value="">All Status</option>
+          <option value="hold" {% if filters.status == 'hold' %}selected{% endif %}>Hold</option>
+          <option value="booked" {% if filters.status == 'booked' %}selected{% endif %}>Booked</option>
+          <option value="completed" {% if filters.status == 'completed' %}selected{% endif %}>Completed</option>
+          <option value="cancelled" {% if filters.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+      <div style="min-width:130px;">
+        <div class="form-label">Turf</div>
+        <select name="turf" class="form-control">
+          <option value="">All Turfs</option>
+          {% for t in turfs %}<option value="{{ t.id }}" {% if filters.turf == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="{% url 'booking_list' %}" class="btn btn-ghost">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="tp-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Customer</th><th>Turf</th><th>Date & Time</th><th>Duration</th><th>Total</th><th>Paid</th><th>Status</th><th>Payment</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td class="text-muted fs-12">#{{ b.id }}</td>
+          <td>
+            <div class="td-name"><a href="{% url 'customer_detail' b.customer.pk %}" style="color:var(--text);">{{ b.customer.name }}</a></div>
+            <div class="td-sub">{{ b.customer.phone }}</div>
+          </td>
+          <td class="text-muted">{{ b.turf.name }}</td>
+          <td>
+    <div class="fw-600">{{ b.booking_date|date:"d M Y" }}{% if b.crosses_midnight %} <span style="font-size:10px; color:#c2410c; font-weight:700;">+1</span>{% endif %}</div>
+    <div class="td-sub">{{ b.start_time|time:"g:i A" }} – {{ b.end_time|time:"g:i A" }}</div>
+</td>
+          <td class="text-muted">{{ b.duration_display }}</td>
+          <td class="fw-600">₹{{ b.total_amount|floatformat:0 }}</td>
+          <td>
+            <div style="color:var(--primary); font-weight:600;">₹{{ b.paid_amount|floatformat:0 }}</div>
+            {% if b.remaining_amount > 0 %}<div class="td-sub text-danger">Due ₹{{ b.remaining_amount|floatformat:0 }}</div>{% endif %}
+          </td>
+          <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+          <td><span class="badge badge-{{ b.payment_status }}">{{ b.get_payment_status_display }}</span></td>
+          <td>
+            <div style="display:flex; gap:4px;">
+              <a href="{% url 'booking_detail' b.pk %}" class="btn btn-ghost btn-sm">View</a>
+              <a href="{% url 'invoice_pdf' b.pk %}" class="btn btn-ghost btn-sm" title="Download PDF"><i class="bi bi-download"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10"><div class="empty-state"><div class="ei">📅</div><p>No bookings found for this period.</p><a href="{% url 'booking_create' %}" class="btn btn-primary btn-sm">Create Booking</a></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — TurfPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --primary:#16a34a; --bg:#f8fafc; --card:#fff; --border:#e2e8f0; --text:#0f172a; --text2:#475569; --text3:#94a3b8; }
+[data-theme="dark"] { --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#e6edf3; --text2:#8b949e; --text3:#484f58; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+.wrap { width:100%; max-width:400px; }
+.logo { text-align:center; margin-bottom:28px; }
+.logo-icon { width:48px; height:48px; background:var(--primary); border-radius:13px; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:12px; }
+.logo-text { font-size:1.4rem; font-weight:800; color:var(--text); }
+.logo-text span { color:var(--primary); }
+.card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:28px; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+.card-title { font-size:1.1rem; font-weight:800; margin-bottom:4px; }
+.card-sub { font-size:13px; color:var(--text3); margin-bottom:22px; }
+.form-group { margin-bottom:14px; }
+label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:5px; text-transform:uppercase; letter-spacing:.4px; }
+input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:13.5px; color:var(--text); font-family:inherit; transition:border-color .15s; }
+input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(22,163,74,.12); }
+input::placeholder { color:var(--text3); }
+.btn { width:100%; padding:11px; background:var(--primary); color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:4px; transition:background .15s; }
+.btn:hover { background:#15803d; }
+.switch-link { text-align:center; margin-top:18px; font-size:13px; color:var(--text3); }
+.switch-link a { color:var(--primary); font-weight:600; }
+.error-msg { background:#fee2e2; border:1px solid #fecaca; color:#b91c1c; border-radius:8px; padding:10px 12px; font-size:13px; margin-bottom:14px; }
+.theme-btn { position:fixed; top:16px; right:16px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px; }
+</style>
+</head>
+<body>
+<button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-icon">⚽</div>
+    <div class="logo-text">Turf<span>Pro</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Welcome back</div>
+    <div class="card-sub">Sign in to your turf dashboard</div>
+    {% for msg in messages %}
+    <div class="error-msg">{{ msg }}</div>
+    {% endfor %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Enter username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter password" required>
+      </div>
+      <button type="submit" class="btn">Sign In</button>
+    </form>
+    <div class="switch-link">Don't have an account? <a href="{% url 'register' %}">Register here</a></div>
+  </div>
+</div>
+<script>
+const t = localStorage.getItem('tp-theme')||'light';
+document.documentElement.setAttribute('data-theme',t);
+document.getElementById('themeBtn').textContent = t==='dark'?'☀️':'🌙';
+function toggleTheme(){const c=document.documentElement.getAttribute('data-theme'),n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('tp-theme',n);document.getElementById('themeBtn').textContent=n==='dark'?'☀️':'🌙';}
+</script>
+</body>
+</html>

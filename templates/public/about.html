@@ -1,0 +1,147 @@
+{% extends 'public/_base.html' %}
+{% block title %}About — TurfPro{% endblock %}
+
+{% block extra_css %}
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+@media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
+.about-grid h3 { font-size: 1.6rem; font-weight: 800; margin-bottom: 14px; letter-spacing: -.5px; }
+.about-grid p { color: var(--text2); margin-bottom: 12px; }
+
+.values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+@media (max-width: 800px) { .values { grid-template-columns: 1fr; } }
+.value-card {
+  background: white; border: 1px solid var(--border); border-radius: 14px;
+  padding: 30px 24px;
+}
+.value-icon {
+  width: 50px; height: 50px;
+  background: var(--primary-light); color: var(--primary);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 16px;
+}
+.value-card h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+.value-card p { font-size: 14px; color: var(--text2); }
+
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 22px; max-width: 900px; margin: 0 auto;
+  background: linear-gradient(135deg, var(--primary-light), #f0fdf4);
+  border-radius: 18px; padding: 36px 24px;
+  border: 1px solid #bbf7d0;
+}
+@media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+.stat-num {
+  font-size: 2.2rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+.stat-lbl { font-size: 12px; color: var(--text2); margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.about-stats-card { text-align: center; }
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <div class="section-tag fade-up">About TurfPro</div>
+    <h1 class="fade-up">Built for India's <span>turf revolution</span></h1>
+    <p class="fade-up-delay">A simple mission: help thousands of turf owners run their business better, with software that actually understands them.</p>
+  </div>
+</section>
+
+<!-- Story -->
+<section>
+  <div class="section-inner">
+    <div class="about-grid">
+      <div>
+        <div class="section-tag">Our Story</div>
+        <h3>From frustration to a real solution</h3>
+        <p>It started with a simple observation — turf owners across India were managing bookings on paper notebooks or scattered WhatsApp messages. Mistakes happened. Money was lost. Customers were upset.</p>
+        <p>The existing software? Either too expensive, too foreign, or too complicated. None of it spoke Hinglish. None of it understood overnight bookings or weekend pricing the way Indian turfs work.</p>
+        <p><strong>So we built TurfPro</strong> — by Indians, for Indians, with Hindi support baked in, mobile-first, and priced for our market.</p>
+      </div>
+      <div style="background:linear-gradient(135deg,#f1f5f9,#fff); border-radius:16px; padding:32px; border:1px solid var(--border);">
+        <div style="font-size:60px; line-height:1; margin-bottom:14px;">🎯</div>
+        <div style="font-size:1.2rem; font-weight:700; margin-bottom:8px;">Our Mission</div>
+        <p style="color:var(--text2); font-size:14px;">Empower every Indian turf owner with software that's simple, smart, and speaks their language. No bloat, no jargon, just tools that work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Values -->
+<section style="background:var(--bg-soft);">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">What We Believe</div>
+      <h2>Our values</h2>
+    </div>
+    <div class="values">
+      <div class="value-card">
+        <div class="value-icon"><i class="bi bi-translate"></i></div>
+        <h4>Made for India</h4>
+        <p>Hindi support, ₹ pricing, IST timezone, UPI payments. Built for how things actually work here.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+        <h4>Speed Over Bloat</h4>
+        <p>Fast pages, simple flows, no unnecessary clicks. Your time is money.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="bi bi-shield-check"></i></div>
+        <h4>Honest Pricing</h4>
+        <p>Free forever for starters. Pay only when you actually need more. No hidden fees, ever.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="bi bi-phone"></i></div>
+        <h4>Mobile First</h4>
+        <p>Most owners use phones, not laptops. Every feature works perfectly on small screens.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="bi bi-chat-heart"></i></div>
+        <h4>Real Support</h4>
+        <p>Talk to actual humans who understand turf business. No bots that don't help.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="bi bi-arrow-repeat"></i></div>
+        <h4>Always Improving</h4>
+        <p>New features every month based on real owner feedback. Your needs shape our roadmap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section>
+  <div class="section-inner">
+    <div class="stats-row">
+      <div class="about-stats-card">
+        <div class="stat-num">5 min</div>
+        <div class="stat-lbl">Setup time</div>
+      </div>
+      <div class="about-stats-card">
+        <div class="stat-num">2</div>
+        <div class="stat-lbl">Languages supported</div>
+      </div>
+      <div class="about-stats-card">
+        <div class="stat-num">∞</div>
+        <div class="stat-lbl">Bookings on Free plan</div>
+      </div>
+      <div class="about-stats-card">
+        <div class="stat-num">24/7</div>
+        <div class="stat-lbl">App availability</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-inner cta-inner">
+    <h2>Join the TurfPro family</h2>
+    <p>Built with care, used by Indian turf owners every day.</p>
+    <a href="{% url 'register' %}" class="btn btn-white btn-lg">Get Started Free</a>
+  </div>
+</section>
+{% endblock %}

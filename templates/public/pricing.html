@@ -1,0 +1,329 @@
+{% extends 'public/_base.html' %}
+{% block title %}Pricing — TurfPro{% endblock %}
+
+{% block extra_css %}
+.free-hero {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.price-display {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 30px 0 14px;
+}
+.price-cur { font-size: 2.4rem; font-weight: 700; color: var(--text2); }
+.price-amt {
+  font-size: 6rem; font-weight: 800; line-height: 1;
+  letter-spacing: -3px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+@media (max-width: 600px) {
+  .price-amt { font-size: 4.5rem; }
+  .price-cur { font-size: 1.8rem; }
+}
+.price-period {
+  font-size: 1.2rem; color: var(--text2); font-weight: 600;
+  margin-left: 8px;
+}
+.free-tagline {
+  font-size: 1.1rem;
+  color: var(--text2);
+  margin-bottom: 30px;
+}
+.free-cta {
+  margin: 8px 0 22px;
+}
+.free-trust {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: 22px;
+  font-size: 13.5px; color: var(--text3); font-weight: 500;
+}
+.free-trust i { color: var(--primary); margin-right: 4px; }
+
+/* Plan card */
+.plan-wrap {
+  max-width: 720px;
+  margin: 60px auto 0;
+}
+.plan-card {
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 20px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(22,163,74,.15);
+  position: relative;
+}
+.plan-banner {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 16px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.plan-banner-l { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
+.plan-banner-l i { font-size: 18px; }
+.plan-banner-r { font-size: 12px; font-weight: 600; opacity: .9; background: rgba(255,255,255,.18); padding: 4px 10px; border-radius: 20px; }
+
+.plan-body { padding: 32px 32px 36px; }
+@media (max-width: 600px) { .plan-body { padding: 24px 20px 28px; } }
+
+.plan-features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 30px;
+  margin-bottom: 28px;
+}
+@media (max-width: 600px) {
+  .plan-features-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+.plan-feature {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 14px; color: var(--text);
+}
+.plan-feature i {
+  color: var(--primary);
+  background: var(--primary-light);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.plan-feature strong { font-weight: 600; }
+
+.plan-cta-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  justify-content: center;
+}
+
+.no-fees {
+  background: var(--bg-soft);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  text-align: center;
+}
+@media (max-width: 600px) { .no-fees { grid-template-columns: 1fr; } }
+.no-fee-item i {
+  display: inline-flex;
+  width: 38px; height: 38px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.no-fee-item h5 { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.no-fee-item p { font-size: 12.5px; color: var(--text3); }
+
+/* FAQ */
+.faq-section { background: var(--bg-soft); }
+.faq-grid { max-width: 760px; margin: 0 auto; }
+.faq-item {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px 22px; margin-bottom: 12px;
+}
+.faq-q { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.faq-a { color: var(--text2); font-size: 14px; }
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-inner free-hero">
+    <div class="section-tag fade-up">Pricing</div>
+    <h1 class="fade-up">Free. <span>Forever.</span></h1>
+
+    <div class="price-display fade-up-delay">
+      <span class="price-cur">₹</span>
+      <span class="price-amt">0</span>
+      <span class="price-period">/ forever</span>
+    </div>
+
+    <p class="free-tagline fade-up-delay">No credit card. No hidden fees. No expiry. Just sign up and start managing your turf.</p>
+
+    <div class="free-cta fade-up-delay-2">
+      <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+        <i class="bi bi-rocket-takeoff-fill"></i> Get Started Free
+      </a>
+    </div>
+
+    <div class="free-trust fade-up-delay-2">
+      <span><i class="bi bi-check-circle-fill"></i> No credit card</span>
+      <span><i class="bi bi-check-circle-fill"></i> Unlimited bookings</span>
+      <span><i class="bi bi-check-circle-fill"></i> All features included</span>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0;">
+  <div class="section-inner">
+
+    <!-- Plan Card -->
+    <div class="plan-wrap">
+      <div class="plan-card">
+        <div class="plan-banner">
+          <div class="plan-banner-l">
+            <i class="bi bi-stars"></i>
+            <span>Everything Included Plan</span>
+          </div>
+          <span class="plan-banner-r">100% FREE</span>
+        </div>
+        <div class="plan-body">
+          <div class="plan-features-grid">
+
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Unlimited turfs</strong> — add as many as you need</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Unlimited bookings</strong> — no monthly limit</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Unlimited customers</strong> — full database</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Dynamic pricing rules</strong> — weekend, holiday, overnight</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>AI chat assistant</strong> — Hindi + English</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Full analytics</strong> — revenue, peaks, trends</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>PDF invoices</strong> — auto-generated</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Payment tracking</strong> — UPI, cash, card, bank</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Booking edit history</strong> — full audit log</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Mobile + Desktop apps</strong> — works everywhere</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>Dark mode</strong> — for night use</span>
+            </div>
+            <div class="plan-feature">
+              <i class="bi bi-check-lg"></i>
+              <span><strong>SSL & secure backups</strong> — your data, safe</span>
+            </div>
+
+          </div>
+
+          <a href="{% url 'register' %}" class="btn btn-primary plan-cta-btn">
+            <i class="bi bi-arrow-right"></i> Sign Up Free
+          </a>
+
+          <div class="no-fees">
+            <div class="no-fee-item">
+              <i class="bi bi-credit-card"></i>
+              <h5>No card needed</h5>
+              <p>Sign up with just your email</p>
+            </div>
+            <div class="no-fee-item">
+              <i class="bi bi-eye-slash"></i>
+              <h5>No hidden fees</h5>
+              <p>What you see is what you get</p>
+            </div>
+            <div class="no-fee-item">
+              <i class="bi bi-infinity"></i>
+              <h5>No expiry</h5>
+              <p>Free today, free always</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Why Free? -->
+<section style="padding-top:30px;">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">Why Free?</div>
+      <h2>Simple — we want you to succeed first</h2>
+      <p>TurfPro is free because we're building for the long run. Help us help thousands of turf owners across India. When we add premium features in the future, your free plan will always remain free.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">FAQ</div>
+      <h2>Common questions</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q">Is it really free? What's the catch?</div>
+        <div class="faq-a">No catch. TurfPro is genuinely free — no credit card, no trial period, no hidden fees. We may add optional premium features later, but everything you see today will remain free.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are there any limits on bookings or customers?</div>
+        <div class="faq-a">Nope. Unlimited bookings, unlimited customers, unlimited turfs, unlimited everything. Use it as much as you need.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will my data be safe?</div>
+        <div class="faq-a">Yes. We use SSL encryption, secure database, and daily backups. Your booking and customer data is yours alone — we never share it.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens if I stop using TurfPro?</div>
+        <div class="faq-a">Nothing changes — your account stays active. You can come back anytime and your data will be there. Want it deleted? Just email us.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I need any technical skills?</div>
+        <div class="faq-a">Not at all. If you can use WhatsApp, you can use TurfPro. Setup takes 5 minutes — sign up, add a turf, take a booking. Done.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How do you make money if it's free?</div>
+        <div class="faq-a">We're in the early growth phase, focused on building the best product for Indian turf owners. Premium features for large multi-location chains will come later. Until then, enjoy everything free.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will you ever charge me?</div>
+        <div class="faq-a">No surprises ever. If we introduce paid plans later, your existing free account will keep working with everything you currently have. Promise.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-inner cta-inner">
+    <h2>Ready when you are</h2>
+    <p>5 minutes to sign up. Free forever. No credit card.</p>
+    <a href="{% url 'register' %}" class="btn btn-white btn-lg">
+      <i class="bi bi-rocket-takeoff-fill"></i> Get Started Free
+    </a>
+  </div>
+</section>
+{% endblock %}

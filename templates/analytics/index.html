@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% block title %}Analytics — TurfPro{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ✅ Fixed-height chart wrappers — prevents infinite resize loop */
+.chart-box {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+.chart-box-sm {
+  position: relative;
+  width: 100%;
+  height: 240px;
+}
+.chart-box-doughnut {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+/* Mobile sizes */
+@media (max-width: 768px) {
+  .chart-box { height: 240px; }
+  .chart-box-sm { height: 220px; }
+  .chart-box-doughnut { height: 240px; }
+}
+
+.chart-box canvas,
+.chart-box-sm canvas,
+.chart-box-doughnut canvas {
+  max-width: 100% !important;
+}
+
+/* Stats grid forced flex layout */
+.an-stats {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.an-stats > .card {
+  flex: 1 1 calc(25% - 11px);
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .an-stats > .card { flex: 1 1 calc(50% - 7px) !important; }
+}
+@media (max-width: 600px) {
+  .an-stats { flex-direction: column !important; }
+  .an-stats > .card { flex: 1 1 100% !important; width: 100% !important; }
+}
+
+/* Charts grid layout */
+.an-charts-row {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.an-charts-row > .card {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.an-charts-row .col-narrow {
+  flex: 0 0 280px;
+}
+@media (max-width: 900px) {
+  .an-charts-row { flex-direction: column !important; }
+  .an-charts-row > .card,
+  .an-charts-row .col-narrow {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="ph-left">
+    <div class="ph-title">Analytics</div>
+    <div class="ph-sub">{{ date_from|date:"d M Y" }} – {{ date_to|date:"d M Y" }}</div>
+  </div>
+</div>
+
+<!-- Summary Stats -->
+<div class="an-stats">
+  <div class="card stat-card">
+    <div class="stat-label">Revenue</div>
+    <div class="stat-value" id="sRevenue">—</div>
+    <div class="stat-icon si-green"><i class="bi bi-currency-rupee"></i></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Bookings</div>
+    <div class="stat-value" id="sBookings">—</div>
+    <div class="stat-icon si-blue"><i class="bi bi-calendar-check"></i></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Pending</div>
+    <div class="stat-value" id="sPending">—</div>
+    <div class="stat-icon si-orange"><i class="bi bi-hourglass-split"></i></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Cancelled</div>
+    <div class="stat-value" id="sCancelled">—</div>
+    <div class="stat-icon si-red"><i class="bi bi-x-circle"></i></div>
+  </div>
+</div>
+
+<!-- Daily Revenue + Payment Methods -->
+<div class="an-charts-row">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Daily Revenue</span></div>
+    <div class="card-body">
+      <div class="chart-box"><canvas id="revenueChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card col-narrow">
+    <div class="card-header"><span class="card-title">Payment Methods</span></div>
+    <div class="card-body">
+      <div class="chart-box-doughnut"><canvas id="payChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Peak Hours + Booking Trend -->
+<div class="an-charts-row">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Peak Hours</span></div>
+    <div class="card-body">
+      <div class="chart-box-sm"><canvas id="hourlyChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Booking Trend (Weekly)</span></div>
+    <div class="card-body">
+      <div class="chart-box-sm"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Turf Utilization + Top Customers -->
+<div class="an-charts-row">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Turf Utilization</span></div>
+    <div class="card-body" id="utilList"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Top Customers</span></div>
+    <div id="topCust"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+const gc = () => isDark() ? '#8b949e' : '#94a3b8';
+const gb = () => isDark() ? '#30363d' : '#e2e8f0';
+
+function buildCharts(data) {
+  // Summary stats
+  document.getElementById('sRevenue').textContent = '₹' + Math.round(data.summary.total_revenue).toLocaleString('en-IN');
+  document.getElementById('sBookings').textContent = data.summary.total_bookings;
+  document.getElementById('sPending').textContent = '₹' + Math.round(data.summary.pending_amount).toLocaleString('en-IN');
+  document.getElementById('sCancelled').textContent = data.summary.cancelled;
+
+  // ✅ Global defaults — critical for stable charts
+  Chart.defaults.color = gc();
+  Chart.defaults.borderColor = gb();
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.responsive = true;
+  Chart.defaults.maintainAspectRatio = false;
+
+  // Daily Revenue
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: data.daily.map(d => d.date),
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: data.daily.map(d => d.revenue),
+        backgroundColor: 'rgba(22,163,74,.25)',
+        borderColor: '#16a34a',
+        borderWidth: 1.5,
+        borderRadius: 4,
+        borderSkipped: false,
+        maxBarThickness: 50
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Payment Methods Doughnut
+  const PM_COLORS = { cash: '#16a34a', upi: '#2563eb', card: '#dc2626', bank_transfer: '#d97706', other: '#9ca3af' };
+  if (data.pay_methods && data.pay_methods.length) {
+    new Chart(document.getElementById('payChart'), {
+      type: 'doughnut',
+      data: {
+        labels: data.pay_methods.map(m => m.method.toUpperCase()),
+        datasets: [{
+          data: data.pay_methods.map(m => m.total),
+          backgroundColor: data.pay_methods.map(m => PM_COLORS[m.method] || '#9ca3af'),
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } } }
+      }
+    });
+  } else {
+    document.getElementById('payChart').parentElement.innerHTML = '<div class="empty-state" style="padding:30px;">No payments yet</div>';
+  }
+
+  // Peak Hours
+  new Chart(document.getElementById('hourlyChart'), {
+    type: 'bar',
+    data: {
+      labels: data.hourly.map(h => h.hour),
+      datasets: [{
+        data: data.hourly.map(h => h.count),
+        backgroundColor: 'rgba(37,99,235,.25)',
+        borderColor: '#2563eb',
+        borderWidth: 1.5,
+        borderRadius: 4,
+        maxBarThickness: 24
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Booking Trend (using daily bookings count from revenue data)
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: data.daily.map(d => d.date),
+      datasets: [{
+        label: 'Revenue',
+        data: data.daily.map(d => d.revenue),
+        borderColor: '#16a34a',
+        backgroundColor: 'rgba(22,163,74,.12)',
+        borderWidth: 2,
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#16a34a'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Turf Utilization
+  const ul = document.getElementById('utilList');
+  ul.innerHTML = '';
+  if (!data.turf_util.length) {
+    ul.innerHTML = '<div class="empty-state" style="padding:24px;">No data yet</div>';
+  } else {
+    data.turf_util.forEach(t => {
+      ul.innerHTML += `<div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px;">
+          <span class="fw-600">${t.name}</span><span class="text-primary fw-700">${t.pct}%</span>
+        </div>
+        <div style="background:var(--border);border-radius:20px;height:8px;overflow:hidden;">
+          <div style="height:100%;width:${t.pct}%;background:var(--primary);border-radius:20px;"></div>
+        </div>
+        <div class="fs-12 text-muted mt-4">${t.booked}h booked in period</div>
+      </div>`;
+    });
+  }
+
+  // Top Customers
+  const tc = document.getElementById('topCust');
+  tc.innerHTML = '';
+  if (!data.top_customers.length) {
+    tc.innerHTML = '<div class="empty-state" style="padding:24px;">No customer data yet</div>';
+  } else {
+    data.top_customers.forEach(c => {
+      tc.innerHTML += `<div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:white;flex-shrink:0;">${c.name[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="fw-600 fs-13">${c.name}</div>
+          <div class="td-sub">${c.bookings} bookings</div>
+        </div>
+        <div class="fw-700 text-primary">₹${Math.round(c.spent).toLocaleString('en-IN')}</div>
+      </div>`;
+    });
+  }
+}
+
+fetch(`/analytics/data/?from={{ date_from|date:"Y-m-d" }}&to={{ date_to|date:"Y-m-d" }}`)
+  .then(r => r.json())
+  .then(buildCharts)
+  .catch(err => console.error('Analytics error:', err));
+</script>
+{% endblock %}

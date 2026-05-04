@@ -1,0 +1,393 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}TurfPro — Smart Turf Booking & Management for India{% endblock %}</title>
+<meta name="description" content="{% block description %}Manage your turf bookings, customers, payments, and revenue all in one place. Built for Indian turf owners.{% endblock %}">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #16a34a;
+  --primary-dark: #15803d;
+  --primary-light: #dcfce7;
+  --bg: #ffffff;
+  --bg-soft: #f8fafc;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --border: #e2e8f0;
+  --shadow: 0 4px 14px rgba(0,0,0,.08);
+  --shadow-lg: 0 20px 50px rgba(0,0,0,.1);
+  --danger: #ef4444;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ── NAVBAR ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 14px 28px;
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; }
+.logo-i { width: 36px; height: 36px; background: var(--primary); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.logo-i .ball { animation: spin 8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.logo span { color: var(--primary); }
+
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-link {
+  font-size: 14px; font-weight: 500; color: var(--text2);
+  transition: color .15s;
+  position: relative;
+}
+.nav-link:hover { color: var(--primary); }
+.nav-link.active { color: var(--primary); font-weight: 600; }
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; left: 0; right: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.nav-actions { display: flex; gap: 10px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  border-radius: 9px;
+  font-weight: 600; font-size: 14px;
+  border: none; cursor: pointer;
+  font-family: inherit;
+  transition: all .18s;
+}
+.btn-ghost { background: transparent; color: var(--text); }
+.btn-ghost:hover { background: var(--bg-soft); }
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(22,163,74,.3); }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(22,163,74,.4); }
+.btn-lg { padding: 14px 28px; font-size: 15px; border-radius: 11px; }
+.btn-white { background: white; color: var(--primary-dark); }
+.btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+
+/* Mobile menu */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* ── PAGE CONTENT WRAP ── */
+main { padding-top: 64px; }
+
+/* ── COMMON SECTIONS ── */
+section { padding: 80px 24px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-head { text-align: center; max-width: 700px; margin: 0 auto 56px; }
+.section-tag {
+  display: inline-block;
+  color: var(--primary);
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+.section-head h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -.8px;
+  line-height: 1.18;
+  margin-bottom: 14px;
+}
+.section-head p {
+  font-size: 1.05rem;
+  color: var(--text2);
+}
+
+/* ── PAGE HERO ── */
+.page-hero {
+  padding: 120px 24px 70px;
+  background: radial-gradient(ellipse at top, rgba(22,163,74,.08), transparent 60%),
+              linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(22,163,74,.12), transparent 70%);
+  border-radius: 50%;
+}
+.page-hero-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+.page-hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.page-hero h1 span {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.page-hero p {
+  font-size: 1.1rem;
+  color: var(--text2);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── CTA SECTION (shared) ── */
+.cta {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,.1), transparent 50%);
+}
+.cta-inner { position: relative; z-index: 1; }
+.cta h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  margin-bottom: 14px;
+  letter-spacing: -.8px;
+}
+.cta p {
+  font-size: 1.05rem;
+  opacity: .9;
+  margin-bottom: 28px;
+  max-width: 580px;
+  margin-left: auto; margin-right: auto;
+}
+
+/* ── FOOTER ── */
+.footer {
+  padding: 50px 24px 30px;
+  background: var(--text);
+  color: #cbd5e1;
+}
+.footer-inner {
+  max-width: 1100px; margin: 0 auto;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 36px;
+  margin-bottom: 36px;
+}
+@media (max-width: 700px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+}
+@media (max-width: 400px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
+.footer-col h4 { color: white; font-size: 13px; font-weight: 700; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .8px; }
+.footer-col a { display: block; padding: 5px 0; color: #94a3b8; font-size: 14px; transition: color .15s; }
+.footer-col a:hover { color: #4ade80; }
+.footer-brand .logo { color: white; margin-bottom: 12px; }
+.footer-brand .logo span { color: #4ade80; }
+.footer-brand p { color: #94a3b8; font-size: 13px; max-width: 280px; }
+.footer-bottom {
+  padding-top: 24px;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp .7s ease-out; }
+.fade-up-delay { animation: fadeUp .7s ease-out .15s backwards; }
+.fade-up-delay-2 { animation: fadeUp .7s ease-out .3s backwards; }
+
+/* Mobile nav */
+@media (max-width: 800px) {
+  .nav {
+    padding: 10px 16px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+  }
+  .nav-inner { width: 100%; }
+  .logo { font-size: 17px; }
+  .logo-i { width: 32px; height: 32px; font-size: 16px; }
+
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--bg-soft);
+  }
+
+  /* ✅ Mobile menu drops BELOW the navbar, not overlap */
+  .nav-links {
+    position: fixed;
+    top: 60px;             /* exact nav height */
+    left: 0; right: 0;
+    flex-direction: column;
+    gap: 0;
+    background: white;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    /* Hidden by default — slide up + invisible */
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height .25s ease, opacity .2s ease;
+    z-index: 99;
+  }
+  .nav-links.open {
+    max-height: 400px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-link {
+    padding: 14px 20px;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+    font-size: 14.5px;
+  }
+  .nav-link:last-child { border-bottom: none; }
+  .nav-link.active { background: var(--primary-light); color: var(--primary); }
+  .nav-link.active::after { display: none; }
+
+  .nav-actions { gap: 8px; }
+  .nav-actions .btn-ghost { display: none; }
+  .nav-actions .btn-primary {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  /* Push content down so navbar doesn't cover it */
+  main { padding-top: 60px; }
+
+  section { padding: 50px 18px; }
+  .page-hero { padding: 70px 18px 50px; }
+}
+
+{% block extra_css %}{% endblock %}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="{% url 'landing' %}" class="logo">
+      <div class="logo-i"><span class="ball">⚽</span></div>
+      Turf<span>Pro</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="{% url 'landing' %}" class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}">Home</a>
+      <a href="{% url 'features_page' %}" class="nav-link {% if request.resolver_match.url_name == 'features_page' %}active{% endif %}">Features</a>
+      <a href="{% url 'pricing_page' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing_page' %}active{% endif %}">Pricing</a>
+      <a href="{% url 'about_page' %}" class="nav-link {% if request.resolver_match.url_name == 'about_page' %}active{% endif %}">About</a>
+      <a href="{% url 'contact_page' %}" class="nav-link {% if request.resolver_match.url_name == 'contact_page' %}active{% endif %}">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <a href="{% url 'login' %}" class="btn btn-ghost">Login</a>
+      <a href="{% url 'register' %}" class="btn btn-primary">Get Started</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="color:white;">
+          <div class="logo-i">⚽</div>
+          Turf<span>Pro</span>
+        </div>
+        <p>Smart turf booking & management for Indian turf owners. Built with ❤️ in India.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="{% url 'features_page' %}">Features</a>
+        <a href="{% url 'pricing_page' %}">Pricing</a>
+        <a href="{% url 'register' %}">Sign Up</a>
+        <a href="{% url 'login' %}">Login</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="{% url 'about_page' %}">About</a>
+        <a href="{% url 'contact_page' %}">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="mailto:hello@turfpro.in">Email Us</a>
+        <a href="{% url 'contact_page' %}">Help Center</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Billzify Technology India. All rights reserved.</span>
+      <span>Made in India 🇮🇳</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle
+  const toggle = document.getElementById('navToggle');
+  const links = document.getElementById('navLinks');
+  if (toggle) toggle.addEventListener('click', () => links.classList.toggle('open'));
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

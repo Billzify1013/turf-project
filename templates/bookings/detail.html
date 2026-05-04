@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+{% block title %}Booking #{{ booking.id }} — TurfPro{% endblock %}
+{% block page_title %}Booking #{{ booking.id }}{% endblock %}
+
+{% block extra_head %}
+<style>
+.bd-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+.bd-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.bd-info-label {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.bd-info-val {
+  font-weight: 700;
+  font-size: 15px;
+  word-break: break-word;
+}
+.bd-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bd-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pay-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  gap: 8px;
+}
+.pay-history-item {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pay-history-item:last-child { border-bottom: none; }
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .bd-layout {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .bd-layout {
+    grid-template-columns: 1fr;
+  }
+  .bd-info-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .bd-info-val {
+    font-size: 14px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  .bd-header-actions {
+    width: 100%;
+  }
+  .bd-header-actions .btn {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .bd-header-actions .btn {
+    flex: 1 1 calc(50% - 4px);
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+  .pay-row {
+    font-size: 13px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="ph-left" style="min-width:0;">
+    <div class="ph-title">Booking #{{ booking.id }}</div>
+    <div class="ph-sub">{{ booking.turf.name }} · {{ booking.booking_date|date:"D, d M Y" }} · {{ booking.start_time|time:"g:i A" }}–{{ booking.end_time|time:"g:i A" }}</div>
+  </div>
+  <div class="bd-header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="sendWhatsApp()" 
+          style="background:#25D366; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:13px; cursor:pointer;">
+    📤 Send Booking via WhatsApp
+  </button>
+    {% if booking.status != 'cancelled' and booking.status != 'completed' %}
+    <button onclick="openEditModal()" class="btn btn-sm" style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa;">
+      <i class="bi bi-pencil"></i> Edit
+    </button>
+    {% endif %}
+    <a href="{% url 'invoice_pdf' booking.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-download"></i> PDF</a>
+    <a href="{% url 'invoice' booking.pk %}" class="btn btn-ghost btn-sm"><i class="bi bi-receipt"></i> Invoice</a>
+    <a href="{% url 'booking_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+</div>
+</div>
+
+
+
+
+<script>
+function sendWhatsApp() {
+
+    // Phone from Django
+    var phone = "{{ booking.customer.phone }}";
+
+    // Clean number (remove spaces, +, etc.)
+    phone = phone.replace(/\D/g, '');
+
+    // Add India code if not present
+    if (!phone.startsWith("91")) {
+        phone = "91" + phone;
+    }
+
+    // Booking details (dynamic from Django)
+    var message = 
+`Hi {{ booking.customer.name }} 👋
+
+🎟 *Booking Confirmation*
+
+🏟 *Turf:* {{ booking.turf.name }}
+🏏 *Game:* {{ booking.turf.sport_type }}
+
+📅 *Date:* {{ booking.booking_date|date:"d M Y" }}
+⏰ *Time:* {{ booking.start_time|time:"g:i A" }} - {{ booking.end_time|time:"g:i A" }}
+
+📌 *Status:* {{ booking.get_status_display }}
+
+💰 *Payment Details*
+━━━━━━━━━━━━━━━
+💵 Total: ₹{{ booking.total_amount|floatformat:0 }}
+✅ Advance Paid: ₹{{ booking.paid_amount|floatformat:0 }}
+⚠️ Remaining: ₹{{ booking.remaining_amount|floatformat:0 }}
+
+🙏 Thank you for booking with us!
+We look forward to serving you 😊`;
+
+    // WhatsApp URL
+    var url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
+
+    // Open WhatsApp
+    window.open(url, '_blank');
+}
+</script>
+
+
+<div class="bd-layout">
+  <!-- Left column -->
+  <div style="min-width:0;">
+
+    <!-- Booking Info -->
+    <div class="card mb-16">
+      <div class="card-header">
+        <span class="card-title">Booking Details</span>
+        <span class="badge badge-{{ booking.status }}" style="font-size:13px; padding:5px 12px;">{{ booking.get_status_display }}</span>
+      </div>
+      <div class="card-body">
+        <div class="bd-info-grid">
+          <div>
+            <div class="bd-info-label">Customer</div>
+            <div class="bd-info-val"><a href="{% url 'customer_detail' booking.customer.pk %}" class="text-primary">{{ booking.customer.name }}</a></div>
+            <div class="text-muted fs-13">{{ booking.customer.phone }}</div>
+            {% if booking.customer.email %}<div class="text-muted fs-13" style="word-break:break-all;">{{ booking.customer.email }}</div>{% endif %}
+          </div>
+          <div>
+            <div class="bd-info-label">Turf</div>
+            <div class="bd-info-val">{{ booking.turf.name }}</div>
+            <div class="text-muted fs-13">{{ booking.turf.sport_type }}</div>
+            {% if booking.turf.location %}<div class="text-muted fs-13">{{ booking.turf.location }}</div>{% endif %}
+          </div>
+          <div>
+          <div class="bd-info-label">Time</div>
+          <div class="bd-info-val">
+            {{ booking.start_time|time:"g:i A" }} – {{ booking.end_time|time:"g:i A" }}
+            {% if booking.end_time <= booking.start_time %}
+              <span style="font-size:11px; background:#fff7ed; color:#c2410c; padding:2px 8px; border-radius:20px; font-weight:700; margin-left:6px;">+1 Day</span>
+            {% endif %}
+          </div>
+          <div class="text-muted fs-13">{{ booking.duration_display }} duration</div>
+      </div>
+          <div>
+    <div class="bd-info-label">Date</div>
+    <div class="bd-info-val">{{ booking.booking_date|date:"d M Y" }}</div>
+    <div class="text-muted fs-13">{{ booking.booking_date|date:"l" }}{% if booking.end_time <= booking.start_time %} → {{ booking.booking_date|date:"d M"|add:"" }} ends next day{% endif %}</div>
+</div></div>
+        {% if booking.notes %}
+        <div class="divider"></div>
+        <div style="font-size:13px; color:var(--text2); background:var(--bg); padding:10px 12px; border-radius:8px;">
+          <i class="bi bi-chat-text" style="color:var(--text3);"></i> {{ booking.notes }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Status Actions -->
+<div class="card mb-16">
+  <div class="card-header">
+    <span class="card-title">Change Status</span>
+    <span class="badge badge-{{ booking.status }}" style="font-size:11px;">Current: {{ booking.get_status_display }}</span>
+  </div>
+  <div class="card-body bd-actions">
+
+    {% if booking.status != 'hold' and booking.status != 'cancelled' %}
+    <button onclick="changeStatus('hold')" class="btn btn-sm" style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa;">
+      <i class="bi bi-pause-circle"></i> Move to Hold
+    </button>
+    {% endif %}
+
+    {% if booking.status != 'booked' and booking.status != 'cancelled' %}
+    <button onclick="changeStatus('booked')" class="btn btn-primary btn-sm">
+      <i class="bi bi-check-circle"></i>
+      {% if booking.status == 'hold' %}Confirm Booking{% else %}Re-activate Booking{% endif %}
+    </button>
+    {% endif %}
+
+    {% if booking.status != 'completed' and booking.status != 'cancelled' %}
+    <button onclick="changeStatus('completed')" class="btn btn-sm" style="background:#dbeafe; color:#1d4ed8;">
+      <i class="bi bi-check2-all"></i> Mark Completed
+    </button>
+    {% endif %}
+
+    {% if booking.status == 'cancelled' %}
+    <button onclick="changeStatus('booked')" class="btn btn-primary btn-sm">
+      <i class="bi bi-arrow-clockwise"></i> Restore as Booked
+    </button>
+    {% endif %}
+
+    {% if booking.status != 'cancelled' %}
+    <button onclick="changeStatus('cancelled')" class="btn btn-danger btn-sm">
+      <i class="bi bi-x-circle"></i> Cancel Booking
+    </button>
+    {% endif %}
+
+  </div>
+</div>
+
+    <!-- Activity Log (per booking) -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">Activity Log</span></div>
+      <div style="padding:8px 20px 16px;">
+        {% for log in logs %}
+        <div class="log-item">
+          <div class="log-dot" style="background:
+            {% if log.action == 'created' %}#dcfce7{% elif log.action == 'payment_added' %}#dbeafe{% elif log.action == 'status_changed' %}#fff7ed{% elif log.action == 'cancelled' %}#fee2e2{% else %}#f3f4f6{% endif %};">
+            {% if log.action == 'created' %}✅{% elif log.action == 'payment_added' %}💰{% elif log.action == 'status_changed' %}🔄{% elif log.action == 'cancelled' %}❌{% else %}📝{% endif %}
+          </div>
+          <div style="min-width:0; flex:1;">
+            <div class="log-desc" style="word-break:break-word;">{{ log.description }}</div>
+            <div class="log-time">{{ log.performed_at|date:"d M Y, H:i" }}</div>
+          </div>
+        </div>
+        {% empty %}
+        <div style="padding:16px 0; text-align:center; color:var(--text3); font-size:13px;">No activity yet</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Payments -->
+  <div style="min-width:0;">
+
+    <!-- Payment Summary -->
+    <div class="card mb-16">
+      <div class="card-header"><span class="card-title">Payment</span></div>
+      <div class="card-body">
+        <div class="pay-row">
+          <span class="text-muted">Total</span>
+          <span class="fw-700">₹{{ booking.total_amount|floatformat:0 }}</span>
+        </div>
+        <div class="pay-row">
+          <span class="text-muted">Paid</span>
+          <span class="fw-700 text-primary">₹<span id="paidVal">{{ booking.paid_amount|floatformat:0 }}</span></span>
+        </div>
+        <div style="height:1px; background:var(--border); margin:10px 0;"></div>
+        <div class="pay-row" style="font-size:14px;">
+          <span class="fw-600">Balance Due</span>
+          <span class="fw-700" style="color:{% if booking.remaining_amount > 0 %}var(--danger){% else %}var(--primary){% endif %}; font-size:16px;">₹<span id="dueVal">{{ booking.remaining_amount|floatformat:0 }}</span></span>
+        </div>
+        <!-- Progress bar -->
+        <div style="margin-top:12px; background:var(--border); border-radius:20px; height:6px; overflow:hidden;">
+          <div id="payBar" style="height:100%; background:var(--primary); border-radius:20px; transition:width .3s;"
+            data-pct="{% if booking.total_amount > 0 %}{{ booking.paid_amount|floatformat:0 }}{% else %}0{% endif %}"
+            data-total="{{ booking.total_amount }}"></div>
+        </div>
+        <div class="mt-8"><span class="badge badge-{{ booking.payment_status }}" id="payStatusBadge">{{ booking.get_payment_status_display }}</span></div>
+      </div>
+    </div>
+
+    <!-- Add Payment -->
+    {% if booking.remaining_amount > 0 and booking.status != 'cancelled' %}
+    <div class="card mb-16">
+      <div class="card-header"><span class="card-title">Add Payment</span></div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>Amount (₹)</label>
+          <input type="number" class="form-control" id="payAmount" placeholder="Enter amount" max="{{ booking.remaining_amount }}">
+        </div>
+        <div class="form-group">
+          <label>Method</label>
+          <select class="form-control" id="payMethod">
+            <option value="cash">Cash</option>
+            <option value="upi">UPI</option>
+            <option value="card">Card</option>
+            <option value="bank_transfer">Bank Transfer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Reference (optional)</label>
+          <input type="text" class="form-control" id="payRef" placeholder="UPI ID / TXN ID">
+        </div>
+        <button onclick="addPayment()" class="btn btn-primary" style="width:100%;">
+          <i class="bi bi-plus-circle"></i> Add Payment
+        </button>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Payment History -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">Payment History</span></div>
+      <div id="payHistory">
+        {% for p in payments %}
+        <div class="pay-history-item">
+          <div style="min-width:0; flex:1;">
+            <div class="fw-600 fs-13">₹{{ p.amount|floatformat:0 }}</div>
+            <div class="td-sub">{{ p.get_method_display }} · {{ p.paid_at|date:"d M, H:i" }}</div>
+            {% if p.reference %}<div class="td-sub" style="word-break:break-all;">{{ p.reference }}</div>{% endif %}
+          </div>
+          <span class="badge badge-paid" style="font-size:11px; flex-shrink:0;">{{ p.get_method_display }}</span>
+        </div>
+        {% empty %}
+        <div style="padding:20px; text-align:center; color:var(--text3); font-size:13px;">No payments yet</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Fix payment bar
+const bar = document.getElementById('payBar');
+if (bar) {
+  const total = parseFloat(bar.dataset.total) || 1;
+  const paid = parseFloat(bar.dataset.pct) || 0;
+  bar.style.width = Math.min((paid/total)*100, 100) + '%';
+}
+
+function changeStatus(s) {
+  const labels = {hold:'Hold', booked:'Booked', completed:'Completed', cancelled:'Cancelled'};
+  if (!confirm(`Change status to "${labels[s] || s}"?`)) return;
+
+  fetch('/bookings/{{ booking.pk }}/status/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrf()
+    },
+    body: JSON.stringify({status: s})
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast('Status updated to ' + (labels[s] || s), 'success');
+      setTimeout(() => location.reload(), 700);
+    } else {
+      showToast(d.error || 'Failed to update status', 'error');
+    }
+  })
+  .catch(err => {
+    showToast('Network error — try again', 'error');
+    console.error(err);
+  });
+}
+function addPayment() {
+  const amt = document.getElementById('payAmount').value;
+  if (!amt || parseFloat(amt)<=0){showToast('Enter valid amount','error');return;}
+  const fd = new FormData();
+  fd.append('amount',amt);fd.append('method',document.getElementById('payMethod').value);
+  fd.append('reference',document.getElementById('payRef').value);
+  fd.append('csrfmiddlewaretoken',getCsrf());
+  fetch('/bookings/{{ booking.pk }}/payment/',{method:'POST',body:fd})
+    .then(r=>r.json()).then(d=>{
+      if(d.success){showToast('Payment recorded!','success');setTimeout(()=>location.reload(),700);}
+      else showToast(d.error,'error');
+    });
+}
+
+// ── Edit Booking ──
+function openEditModal() {
+  document.getElementById('editModal').classList.add('open');
+  document.getElementById('suggestionsBox').style.display = 'none';
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+}
+
+function saveEdit() {
+  const date = document.getElementById('editDate').value;
+  const start = document.getElementById('editStart').value;
+  const end = document.getElementById('editEnd').value;
+  const amount = document.getElementById('editAmount').value;
+  const paidAmount = {{ booking.paid_amount }};
+
+  if (!date || !start || !end || !amount) {
+    showToast('Please fill all fields', 'error'); return;
+  }
+  if (parseFloat(amount) < paidAmount) {
+    showToast('Amount cannot be less than paid (₹' + paidAmount + ')', 'error'); return;
+  }
+
+  const btn = document.getElementById('saveEditBtn');
+  btn.disabled = true; btn.innerHTML = 'Saving...';
+
+  const fd = new FormData();
+  fd.append('booking_date', date);
+  fd.append('start_time', start);
+  fd.append('end_time', end);
+  fd.append('total_amount', amount);
+  fd.append('csrfmiddlewaretoken', getCsrf());
+
+  fetch('/bookings/{{ booking.pk }}/edit/', { method: 'POST', body: fd })
+    .then(r => r.json()).then(d => {
+      btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg"></i> Save Changes';
+      if (d.success) {
+        showToast('Booking updated!', 'success');
+        setTimeout(() => location.reload(), 700);
+      } else {
+        showToast(d.error || 'Failed to update', 'error');
+        // Show suggestions if available
+        if (d.suggestions && d.suggestions.length > 0) {
+          const box = document.getElementById('suggestionsBox');
+          const list = document.getElementById('suggestionsList');
+          list.innerHTML = '';
+          d.suggestions.forEach(s => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.style.cssText = 'background:white; border:1px solid #fed7aa; border-radius:8px; padding:9px 12px; text-align:left; cursor:pointer; font-family:inherit; display:flex; justify-content:space-between; align-items:center; gap:10px;';
+            btn.innerHTML = `<span style="font-weight:600; font-size:13px;">${s.label}</span><span style="font-size:11px; color:#6b7280;">on ${new Date(s.date+'T00:00').toLocaleDateString('en-IN', {day:'numeric', month:'short'})}</span>`;
+            btn.onclick = () => {
+              document.getElementById('editDate').value = s.date;
+              document.getElementById('editStart').value = s.start;
+              document.getElementById('editEnd').value = s.end;
+              box.style.display = 'none';
+              showToast('Slot applied. Click Save to confirm.', 'success');
+            };
+            list.appendChild(btn);
+          });
+          box.style.display = 'block';
+        }
+      }
+    })
+    .catch(err => {
+      btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg"></i> Save Changes';
+      showToast('Network error', 'error');
+    });
+}
+</script>
+
+
+<!-- Edit Booking Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <span class="modal-title">Edit Booking #{{ booking.id }}</span>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" class="form-control" id="editDate" value="{{ booking.booking_date|date:'Y-m-d' }}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Start Time</label>
+          <input type="time" class="form-control" id="editStart" value="{{ booking.start_time|time:'H:i' }}">
+        </div>
+        <div class="form-group">
+          <label>End Time</label>
+          <input type="time" class="form-control" id="editEnd" value="{{ booking.end_time|time:'H:i' }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Total Amount (₹)</label>
+        <input type="number" class="form-control" id="editAmount" value="{{ booking.total_amount|floatformat:0 }}" min="0">
+        <div class="fs-12 text-muted mt-4">Already paid: ₹{{ booking.paid_amount|floatformat:0 }}. New amount must be ≥ paid amount.</div>
+      </div>
+
+      <!-- Suggestions box (hidden by default, shown when overlap occurs) -->
+      <div id="suggestionsBox" style="display:none; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:12px; margin-top:10px;">
+        <div style="font-weight:700; color:#c2410c; margin-bottom:8px; font-size:13px;">⚠️ This slot is already booked. Try these alternatives:</div>
+        <div id="suggestionsList" style="display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveEditBtn" onclick="saveEdit()">
+        <i class="bi bi-check-lg"></i> Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}

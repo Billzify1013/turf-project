@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% block title %}{{ customer.name }} — TurfPro{% endblock %}
+{% block page_title %}Customer{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── Header ── */
+.cd-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.cd-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1.25rem; color: white;
+  flex-shrink: 0;
+}
+.cd-info { min-width: 0; flex: 1; overflow: hidden; }
+.cd-info .ph-title {
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cd-info .ph-sub {
+  font-size: 12px;
+  word-break: break-word;
+  white-space: normal;
+}
+.cd-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* ✅ ── STATS — flex-based, definitely 1 col on mobile ── */
+.cd-stats {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  width: 100%;
+}
+.cd-stat-card {
+  flex: 1 1 calc(25% - 9px);     /* 4 cols on desktop */
+  min-width: 0;
+  max-width: 100%;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.cd-stat-card .stat-label {
+  font-size: 12px;
+  margin-bottom: 4px;
+  padding-right: 40px;
+}
+.cd-stat-card .stat-value {
+  font-size: 1.4rem;
+  word-break: break-word;
+}
+.cd-stat-card .stat-sub {
+  font-size: 11px;
+  margin-top: 3px;
+}
+.cd-stat-card .stat-icon {
+  width: 34px; height: 34px;
+  font-size: 14px;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Tablet: 2 columns */
+@media (max-width: 900px) {
+  .cd-stat-card {
+    flex: 1 1 calc(50% - 6px) !important;
+    max-width: calc(50% - 6px) !important;
+  }
+}
+
+/* ✅ MOBILE: 1 card per row, FULL WIDTH */
+@media (max-width: 600px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+  .cd-header { width: 100%; }
+  .cd-actions { width: 100%; }
+  .cd-actions .btn { flex: 1; justify-content: center; }
+
+  .cd-stats {
+    flex-direction: column !important;
+    gap: 10px;
+  }
+  .cd-stat-card {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+/* ── Filter bar ── */
+.cd-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+}
+.cd-filter-active {
+  color: var(--primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Booking list views ── */
+.cd-table-wrap { display: block; }
+.cd-mobile-list { display: none; }
+
+@media (max-width: 600px) {
+  .cd-table-wrap { display: none; }
+  .cd-mobile-list { display: block; padding: 8px 14px 14px; }
+}
+
+.cd-bk-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  display: block;
+  color: var(--text);
+}
+.cd-bk-card:active { background: var(--card); border-color: var(--primary); }
+.cd-bk-row1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cd-bk-row1 > div:first-child {
+  min-width: 0;
+  flex: 1;
+}
+.cd-bk-date {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.cd-bk-row1 .badge { flex-shrink: 0; }
+.cd-bk-row2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text2);
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cd-bk-amount {
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+}
+.cd-bk-card .td-sub {
+  font-size: 11.5px;
+  color: var(--text3);
+  margin-top: 2px;
+  word-break: break-word;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="cd-header">
+    <div class="cd-avatar">{{ customer.name|first|upper }}</div>
+    <div class="cd-info">
+      <div class="ph-title">{{ customer.name }}</div>
+      <div class="ph-sub">{{ customer.phone }}{% if customer.email %} · {{ customer.email }}{% endif %}</div>
+    </div>
+  </div>
+  <div class="cd-actions">
+    <a href="{% url 'booking_create' %}?phone={{ customer.phone }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Booking</a>
+    <a href="{% url 'customer_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="cd-stats">
+  <div class="card stat-card cd-stat-card">
+    <div class="stat-label">Total Bookings</div>
+    <div class="stat-value">{{ customer.total_bookings }}</div>
+    <div class="stat-icon si-green"><i class="bi bi-calendar-check"></i></div>
+  </div>
+  <div class="card stat-card cd-stat-card">
+    <div class="stat-label">Total Spent</div>
+    <div class="stat-value">₹{{ customer.total_spent|floatformat:0 }}</div>
+    <div class="stat-icon si-blue"><i class="bi bi-wallet2"></i></div>
+  </div>
+  <div class="card stat-card cd-stat-card">
+    <div class="stat-label">Pending Due</div>
+    <div class="stat-value" style="color:{% if total_due > 0 %}var(--danger){% else %}var(--text){% endif %};">₹{{ total_due|floatformat:0 }}</div>
+    <div class="stat-sub">{{ due_bookings_count }} unpaid {% if due_bookings_count == 1 %}booking{% else %}bookings{% endif %}</div>
+    <div class="stat-icon si-orange"><i class="bi bi-clock-history"></i></div>
+  </div>
+  <div class="card stat-card cd-stat-card">
+    <div class="stat-label">Cancelled</div>
+    <div class="stat-value">{{ cancelled_count }}</div>
+    <div class="stat-sub">₹{{ cancelled_amount|floatformat:0 }} value</div>
+    <div class="stat-icon si-red"><i class="bi bi-x-circle"></i></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Booking History</span>
+    <span class="fs-12 text-muted">{{ total_in_view }} {% if total_in_view == 1 %}booking{% else %}bookings{% endif %}</span>
+  </div>
+
+  {% if user_filter %}
+  <div style="padding:10px 16px 0;">
+    <div class="cd-filter-bar">
+      <span class="cd-filter-active">
+        <i class="bi bi-funnel-fill"></i> Filtered: {{ date_from|date:"d M" }} – {{ date_to|date:"d M Y" }}
+      </span>
+      <a href="{% url 'customer_detail' customer.pk %}" class="btn btn-ghost btn-sm">
+        <i class="bi bi-x"></i> Clear filter
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Desktop / Tablet: table view -->
+  <div class="cd-table-wrap table-wrap">
+    <table class="tp-table">
+      <thead>
+        <tr><th>Date</th><th>Turf</th><th>Time</th><th>Duration</th><th>Amount</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td class="fw-600">{{ b.booking_date|date:"d M Y" }}{% if b.crosses_midnight %} <span style="font-size:10px; color:#c2410c; font-weight:700;">+1</span>{% endif %}</td>
+          <td class="text-muted">{{ b.turf.name }}</td>
+          <td class="text-muted">{{ b.start_time|time:"g:i A" }} – {{ b.end_time|time:"g:i A" }}</td>
+          <td class="text-muted">{{ b.duration_display }}</td>
+          <td>
+            <div class="fw-600">₹{{ b.total_amount|floatformat:0 }}</div>
+            <div class="td-sub">
+              Paid ₹{{ b.paid_amount|floatformat:0 }}
+              {% if b.remaining_amount > 0 and b.status != 'cancelled' %}
+                <span class="text-danger">· Due ₹{{ b.remaining_amount|floatformat:0 }}</span>
+              {% endif %}
+            </div>
+          </td>
+          <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+          <td><a href="{% url 'booking_detail' b.pk %}" class="btn btn-ghost btn-sm">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state" style="padding:24px;">
+          {% if user_filter %}No bookings in this period{% else %}No bookings yet{% endif %}
+        </div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile: card view -->
+  <div class="cd-mobile-list">
+    {% for b in bookings %}
+    <a href="{% url 'booking_detail' b.pk %}" class="cd-bk-card">
+      <div class="cd-bk-row1">
+        <div>
+          <div class="cd-bk-date">
+            {{ b.booking_date|date:"d M Y" }}{% if b.crosses_midnight %} <span style="font-size:10px; color:#c2410c; font-weight:700;">+1</span>{% endif %}
+          </div>
+          <div class="td-sub">{{ b.turf.name }} · {{ b.start_time|time:"g:i A" }} – {{ b.end_time|time:"g:i A" }}</div>
+        </div>
+        <span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span>
+      </div>
+      <div class="cd-bk-row2">
+        <span>Duration: <strong>{{ b.duration_display }}</strong></span>
+        <span class="cd-bk-amount">
+          ₹{{ b.total_amount|floatformat:0 }}
+          {% if b.remaining_amount > 0 and b.status != 'cancelled' %}
+            <span class="text-danger" style="font-weight:600;"> · Due ₹{{ b.remaining_amount|floatformat:0 }}</span>
+          {% endif %}
+        </span>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="padding:24px;">
+      {% if user_filter %}No bookings in this period{% else %}No bookings yet{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

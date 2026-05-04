@@ -1,0 +1,282 @@
+{% extends 'public/_base.html' %}
+{% block title %}Features — TurfPro{% endblock %}
+
+{% block extra_css %}
+.feature-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: center;
+  padding: 70px 0;
+  border-bottom: 1px solid var(--border);
+}
+.feature-row:last-child { border-bottom: none; }
+.feature-row.reverse { direction: rtl; }
+.feature-row.reverse > * { direction: ltr; }
+@media (max-width: 800px) {
+  .feature-row, .feature-row.reverse { grid-template-columns: 1fr; gap: 30px; padding: 40px 0; direction: ltr; }
+}
+.feature-content .ft-tag {
+  color: var(--primary); font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px;
+}
+.feature-content h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800; letter-spacing: -.6px; margin-bottom: 14px;
+}
+.feature-content p { color: var(--text2); font-size: 1rem; margin-bottom: 18px; }
+.feature-content ul { list-style: none; }
+.feature-content li {
+  display: flex; gap: 10px; padding: 6px 0;
+  font-size: 14.5px; color: var(--text);
+}
+.feature-content li i { color: var(--primary); flex-shrink: 0; margin-top: 3px; }
+.feature-visual {
+  background: linear-gradient(135deg, var(--primary-light), #f0fdf4);
+  border-radius: 18px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #bbf7d0;
+  min-height: 280px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.fv-card {
+  background: white; border-radius: 11px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  margin-bottom: 10px;
+}
+.fv-row { display: flex; justify-content: space-between; align-items: center; }
+.fv-name { font-weight: 700; font-size: 14px; }
+.fv-time { font-size: 12px; color: var(--text3); }
+.fv-amt { font-weight: 700; color: var(--primary); }
+.fv-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.fv-badge.booked { background: #dcfce7; color: #15803d; }
+.fv-badge.hold { background: #fff7ed; color: #c2410c; }
+.fv-chat-msg { background: white; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; max-width: 80%; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.fv-chat-msg.user { background: var(--primary); color: white; align-self: flex-end; margin-left: auto; }
+.fv-bar-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; font-size: 13px; }
+.fv-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,.6); border-radius: 4px; margin: 0 10px; overflow: hidden; }
+.fv-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; }
+
+.faq-section { background: var(--bg-soft); }
+.faq-grid { max-width: 760px; margin: 0 auto; }
+.faq-item {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px 22px; margin-bottom: 12px;
+}
+.faq-q { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.faq-a { color: var(--text2); font-size: 14px; }
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <div class="section-tag fade-up">All Features</div>
+    <h1 class="fade-up">Everything you need <span>in one place</span></h1>
+    <p class="fade-up-delay">Powerful, polished, and built specifically for the way Indian turf businesses work.</p>
+  </div>
+</section>
+
+<section>
+  <div class="section-inner">
+
+    <!-- 1. Smart booking -->
+    <div class="feature-row">
+      <div class="feature-content">
+        <div class="ft-tag">Smart Booking</div>
+        <h3>Create bookings in 30 seconds</h3>
+        <p>Visual time-slot grid, returning customer auto-fill, midnight-crossing bookings — all built in.</p>
+        <ul>
+          <li><i class="bi bi-check-circle-fill"></i> Click-and-pick time slot grid</li>
+          <li><i class="bi bi-check-circle-fill"></i> 11 PM → 1 AM overnight bookings</li>
+          <li><i class="bi bi-check-circle-fill"></i> Returning customer phone auto-fill</li>
+          <li><i class="bi bi-check-circle-fill"></i> Real-time conflict detection</li>
+          <li><i class="bi bi-check-circle-fill"></i> Quick duration shortcuts (30 min, 1 hr, 1.5 hr)</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Round Turf</div><div class="fv-time">6:00 PM – 7:00 PM</div></div>
+            <span class="fv-badge booked">BOOKED</span>
+          </div>
+        </div>
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Round Turf</div><div class="fv-time">7:00 PM – 8:00 PM</div></div>
+            <span class="fv-badge booked">BOOKED</span>
+          </div>
+        </div>
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Round Turf</div><div class="fv-time">8:00 PM – 9:00 PM</div></div>
+            <span class="fv-badge hold">HOLD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Dynamic Pricing -->
+    <div class="feature-row reverse">
+      <div class="feature-content">
+        <div class="ft-tag">Dynamic Pricing</div>
+        <h3>Earn more with smart pricing rules</h3>
+        <p>Different rates for different times, days, and dates — automatically applied to every booking.</p>
+        <ul>
+          <li><i class="bi bi-check-circle-fill"></i> Fixed price OR multiplier (1.5x, 2x, etc)</li>
+          <li><i class="bi bi-check-circle-fill"></i> Day-of-week rules (weekend premium)</li>
+          <li><i class="bi bi-check-circle-fill"></i> Specific date rules (holidays)</li>
+          <li><i class="bi bi-check-circle-fill"></i> Overnight rules (5 PM → 6 AM)</li>
+          <li><i class="bi bi-check-circle-fill"></i> Priority logic — date > day > time-only</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Weekday Day</div><div class="fv-time">6 AM – 5 PM</div></div>
+            <div class="fv-amt">₹600/hr</div>
+          </div>
+        </div>
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Evening Premium</div><div class="fv-time">5 PM – 11 PM</div></div>
+            <div class="fv-amt">₹1,200/hr</div>
+          </div>
+        </div>
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Weekend</div><div class="fv-time">Sat–Sun</div></div>
+            <div class="fv-amt">×1.5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AI Chat -->
+    <div class="feature-row">
+      <div class="feature-content">
+        <div class="ft-tag">AI Assistant</div>
+        <h3>Ask anything, get instant answers</h3>
+        <p>Built-in AI chat that understands Hindi, English, and Hinglish. Ask about bookings, create new ones, get insights.</p>
+        <ul>
+          <li><i class="bi bi-check-circle-fill"></i> Hindi + English + Hinglish support</li>
+          <li><i class="bi bi-check-circle-fill"></i> Create bookings via chat</li>
+          <li><i class="bi bi-check-circle-fill"></i> Check availability instantly</li>
+          <li><i class="bi bi-check-circle-fill"></i> Update payments and amounts</li>
+          <li><i class="bi bi-check-circle-fill"></i> Day schedule with free gaps</li>
+        </ul>
+      </div>
+      <div class="feature-visual" style="display:flex; flex-direction:column; gap:0;">
+        <div class="fv-chat-msg user">Aaj ka schedule kya hai?</div>
+        <div class="fv-chat-msg">📅 Round Turf — 30 Apr<br>🟢 FREE 6 AM – 6 PM<br>🔴 BOOKED 6 PM – 7 PM<br>🟢 FREE 7 PM – 11 PM</div>
+        <div class="fv-chat-msg user">Kal 8 PM se 10 PM book karo</div>
+        <div class="fv-chat-msg">✓ Booked! Total ₹2,400</div>
+      </div>
+    </div>
+
+    <!-- 4. Analytics -->
+    <div class="feature-row reverse">
+      <div class="feature-content">
+        <div class="ft-tag">Analytics</div>
+        <h3>Know your business inside out</h3>
+        <p>Real-time insights into revenue, peak hours, top customers, and turf utilization. Make data-driven decisions.</p>
+        <ul>
+          <li><i class="bi bi-check-circle-fill"></i> Daily/weekly/monthly revenue charts</li>
+          <li><i class="bi bi-check-circle-fill"></i> Peak hours visualization</li>
+          <li><i class="bi bi-check-circle-fill"></i> Turf utilization percentage</li>
+          <li><i class="bi bi-check-circle-fill"></i> Top customers ranking</li>
+          <li><i class="bi bi-check-circle-fill"></i> Payment method breakdown</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div style="background:white; border-radius:11px; padding:18px; box-shadow:0 2px 6px rgba(0,0,0,.06);">
+          <div style="font-weight:700; font-size:13px; margin-bottom:14px;">Turf Utilization</div>
+          <div class="fv-bar-row"><span style="font-weight:600;">Round Turf</span><div class="fv-bar-track"><div class="fv-bar-fill" style="width:78%;"></div></div><span style="font-weight:700;">78%</span></div>
+          <div class="fv-bar-row"><span style="font-weight:600;">Turf 2</span><div class="fv-bar-track"><div class="fv-bar-fill" style="width:55%;"></div></div><span style="font-weight:700;">55%</span></div>
+          <div class="fv-bar-row"><span style="font-weight:600;">Turf 3</span><div class="fv-bar-track"><div class="fv-bar-fill" style="width:42%;"></div></div><span style="font-weight:700;">42%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Payments -->
+    <div class="feature-row">
+      <div class="feature-content">
+        <div class="ft-tag">Payments</div>
+        <h3>Track every rupee, never miss a due</h3>
+        <p>Manage advance, partial, and full payments. Auto-generated PDF invoices for every booking.</p>
+        <ul>
+          <li><i class="bi bi-check-circle-fill"></i> UPI, Cash, Card, Bank Transfer</li>
+          <li><i class="bi bi-check-circle-fill"></i> Advance + remaining tracking</li>
+          <li><i class="bi bi-check-circle-fill"></i> Per-booking payment history</li>
+          <li><i class="bi bi-check-circle-fill"></i> PDF invoice download</li>
+          <li><i class="bi bi-check-circle-fill"></i> Pending dues dashboard</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Total Amount</div><div class="fv-time">Booking #45</div></div>
+            <div class="fv-amt">₹2,400</div>
+          </div>
+        </div>
+        <div class="fv-card">
+          <div class="fv-row">
+            <div><div class="fv-name">Paid (UPI)</div><div class="fv-time">29 Apr</div></div>
+            <div class="fv-amt">₹500</div>
+          </div>
+        </div>
+        <div class="fv-card" style="border-left:3px solid var(--danger);">
+          <div class="fv-row">
+            <div><div class="fv-name" style="color:var(--danger);">Pending</div><div class="fv-time">Due ASAP</div></div>
+            <div class="fv-amt" style="color:var(--danger);">₹1,900</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">FAQ</div>
+      <h2>Common questions</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q">Is TurfPro really free to start?</div>
+        <div class="faq-a">Yes — 100% free for the starter plan. No credit card needed. You can add unlimited turfs, customers, and bookings.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Does it work in Hindi?</div>
+        <div class="faq-a">Yes. The AI chat assistant understands Hindi, English, and Hinglish. Just type how you talk.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I edit a booking after creating it?</div>
+        <div class="faq-a">Absolutely. Change date, time, amount, or status anytime. If a new time conflicts, alternatives are suggested automatically.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How does dynamic pricing work?</div>
+        <div class="faq-a">Set rules with priority — Specific Date > Day of Week > Time-only > Default. Each rule can be a fixed price or multiplier.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can my customers book themselves online?</div>
+        <div class="faq-a">Self-booking is on our roadmap. Currently, you (the owner) create bookings on behalf of customers. AI chat makes it 30 seconds work.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-inner cta-inner">
+    <h2>See it for yourself</h2>
+    <p>Sign up free, add your first turf, take a booking — all in under 5 minutes.</p>
+    <a href="{% url 'register' %}" class="btn btn-white btn-lg">
+      Start Free <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+</section>
+{% endblock %}

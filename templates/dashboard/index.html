@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — TurfPro{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Stat cards */
+.stat-trend { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.stat-trend.up { color: var(--primary); }
+.stat-trend.down { color: var(--danger); }
+
+/* Day Card (each date in timeline) */
+.day-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.day-card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.day-title { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.day-today-pill {
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.day-stats { display: flex; gap: 14px; font-size: 12px; }
+.day-stat { display: flex; align-items: center; gap: 5px; color: var(--text2); }
+.day-stat-num { font-weight: 800; color: var(--text); }
+
+/* Per-turf row (ball-to-ball view) */
+.turf-row {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.turf-row:last-child { border-bottom: none; }
+.turf-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.turf-name-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.turf-icon-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+.turf-count-badge {
+  font-size: 11px;
+  color: var(--text3);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Booking pills (ball-to-ball view) */
+.booking-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.booking-pill {
+  flex-shrink: 0;
+  min-width: 160px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 9px;
+  padding: 9px 11px;
+  cursor: pointer;
+  transition: all .15s;
+  text-decoration: none;
+}
+.booking-pill:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.booking-pill.status-hold { border-left-color: #ea580c; }
+.booking-pill.status-completed { border-left-color: #2563eb; }
+.booking-pill.status-cancelled { border-left-color: var(--danger); opacity: .7; }
+.bp-time {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.bp-customer {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bp-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10.5px;
+  color: var(--text3);
+}
+.bp-amount { color: var(--primary); font-weight: 700; }
+
+.empty-turf {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--text3);
+  font-size: 12.5px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+/* Pipeline */
+.pipeline-card { padding: 16px; }
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.pipe-cell {
+  text-align: center;
+  padding: 14px 8px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+.pipe-num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+.pipe-label {
+  font-size: 10.5px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.pipe-cell.hold .pipe-num { color: #ea580c; }
+.pipe-cell.booked .pipe-num { color: var(--primary); }
+.pipe-cell.completed .pipe-num { color: #2563eb; }
+.pipe-cell.cancelled .pipe-num { color: var(--danger); }
+
+@media (max-width: 480px) {
+  .booking-pill { min-width: 140px; }
+  .pipeline-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="grid-4 mb-20">
+  <div class="card stat-card">
+    <div class="stat-label">Revenue Collected</div>
+    <div class="stat-value">₹{{ revenue|floatformat:0 }}</div>
+    <div class="stat-sub">{{ date_from|date:"d M" }} – {{ date_to|date:"d M Y" }}</div>
+    <div class="stat-icon si-green"><i class="bi bi-currency-rupee"></i></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Bookings</div>
+    <div class="stat-value">{{ total_bookings }}</div>
+    <div class="stat-sub">In selected range</div>
+    <div class="stat-icon si-blue"><i class="bi bi-calendar-check"></i></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Pending (in range)</div>
+    <div class="stat-value">₹{{ pending|floatformat:0 }}</div>
+    {% if future_pending > 0 %}
+    <div class="stat-trend">+ ₹{{ future_pending|floatformat:0 }} after this range</div>
+    {% else %}
+    <div class="stat-sub">Unpaid in range</div>
+    {% endif %}
+    <div class="stat-icon si-orange"><i class="bi bi-clock"></i></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-label">Customers</div>
+    <div class="stat-value">{{ total_customers }}</div>
+    <div class="stat-sub">Total registered</div>
+    <div class="stat-icon si-red"><i class="bi bi-people"></i></div>
+  </div>
+</div>
+
+<!-- Pipeline (range-aware) -->
+<div class="card mb-20 pipeline-card">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+    <span class="card-title">Booking Pipeline</span>
+    <span class="fs-12 text-muted">{{ date_from|date:"d M" }} – {{ date_to|date:"d M Y" }}</span>
+  </div>
+  <div class="pipeline-grid">
+    <div class="pipe-cell hold">
+      <div class="pipe-num">{{ pipeline.hold }}</div>
+      <div class="pipe-label">Hold</div>
+    </div>
+    <div class="pipe-cell booked">
+      <div class="pipe-num">{{ pipeline.booked }}</div>
+      <div class="pipe-label">Booked</div>
+    </div>
+    <div class="pipe-cell completed">
+      <div class="pipe-num">{{ pipeline.completed }}</div>
+      <div class="pipe-label">Completed</div>
+    </div>
+    <div class="pipe-cell cancelled">
+      <div class="pipe-num">{{ pipeline.cancelled }}</div>
+      <div class="pipe-label">Cancelled</div>
+    </div>
+  </div>
+</div>
+
+<!-- Day-by-day Booking View (Ball-to-ball) -->
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+  <div class="ph-title" style="font-size:1rem;">Day-by-Day Bookings</div>
+  <div class="fs-12 text-muted">Each turf's bookings, ball-to-ball</div>
+</div>
+
+{% if not turfs %}
+<div class="card">
+  <div class="empty-state">
+    <div class="ei">🏟️</div>
+    <p>No turfs added yet.</p>
+    <a href="{% url 'turf_list' %}" class="btn btn-primary btn-sm">Add Your First Turf</a>
+  </div>
+</div>
+{% else %}
+
+{% for day in timeline_days %}
+<div class="day-card">
+  <div class="day-card-header">
+    <div class="day-title">
+      <i class="bi bi-calendar3" style="color:var(--primary);"></i>
+      {{ day.label }}
+      {% if day.is_today %}<span class="day-today-pill">TODAY</span>{% endif %}
+    </div>
+    <div class="day-stats">
+      {% with total_count=0 %}
+      {% for t in day.turfs %}{% endfor %}
+      {% endwith %}
+      <span class="day-stat"><i class="bi bi-grid"></i> <span class="day-stat-num">{{ day.turfs|length }}</span> turfs</span>
+    </div>
+  </div>
+
+  {% for t in day.turfs %}
+  <div class="turf-row">
+    <div class="turf-row-head">
+      <div class="turf-name-tag">
+        <span class="turf-icon-dot"></span>
+        {{ t.name }}
+        <span class="turf-count-badge">{{ t.booked_count }} {% if t.booked_count == 1 %}booking{% else %}bookings{% endif %}</span>
+      </div>
+      <a href="{% url 'booking_create' %}?turf={{ t.id }}" class="btn btn-ghost btn-sm">+ Add</a>
+    </div>
+
+    {% if t.bookings %}
+    <div class="booking-strip">
+      {% for b in t.bookings %}
+      <a href="{% url 'booking_detail' b.id %}" class="booking-pill status-{{ b.status }}">
+        <div class="bp-time">{{ b.start_12 }} – {{ b.end_12 }}</div>
+        <div class="bp-customer">{{ b.customer }}</div>
+        <div class="bp-meta">
+          <span>{{ b.duration }}</span>
+          <span class="bp-amount">₹{{ b.amount|floatformat:0 }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-turf">No bookings yet for this day</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% empty %}
+<div class="card"><div class="empty-state"><div class="ei">📅</div><p>No bookings in selected range. Try a different date.</p></div></div>
+{% endfor %}
+
+{% endif %}
+
+<!-- Recent Bookings -->
+<div class="card mt-20">
+  <div class="card-header">
+    <span class="card-title">Recent Bookings</span>
+    <a href="{% url 'booking_list' %}" class="btn btn-ghost btn-sm">View all</a>
+  </div>
+  <div class="table-wrap">
+    <table class="tp-table">
+      <thead>
+        <tr><th>Customer</th><th>Turf</th><th>Date & Time</th><th>Amount</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for b in recent_bookings %}
+        <tr onclick="window.location='{% url 'booking_detail' b.pk %}'" style="cursor:pointer;">
+          <td>
+            <div class="td-name">{{ b.customer.name }}</div>
+            <div class="td-sub">{{ b.customer.phone }}</div>
+          </td>
+          <td class="text-muted">{{ b.turf.name }}</td>
+          <td>
+              <div class="fw-600">{{ b.booking_date|date:"d M Y" }}{% if b.crosses_midnight %} <span style="font-size:10px; color:#c2410c; font-weight:700;">+1</span>{% endif %}</div>
+              <div class="td-sub">{{ b.start_time|time:"g:i A" }} – {{ b.end_time|time:"g:i A" }}</div>
+          </td>
+          <td>
+            <div class="fw-600">₹{{ b.total_amount|floatformat:0 }}</div>
+            {% if b.remaining_amount > 0 %}<div class="td-sub text-danger">Due ₹{{ b.remaining_amount|floatformat:0 }}</div>{% endif %}
+          </td>
+          <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="empty-state" style="padding:32px;">No bookings yet. <a href="{% url 'booking_create' %}" class="text-primary fw-600">Create one →</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

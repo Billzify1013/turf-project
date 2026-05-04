@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+{% block title %}New Booking — TurfPro{% endblock %}
+{% block page_title %}New Booking{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Time selection display */
+.time-display {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  background: var(--primary-light);
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+[data-theme="dark"] .time-display { background: rgba(22,163,74,.1); border-color: rgba(22,163,74,.25); }
+.td-section { flex: 1; text-align: center; padding: 4px 6px; }
+.td-label { font-size: 10px; font-weight: 700; color: var(--primary); letter-spacing: 1px; margin-bottom: 2px; }
+.td-time { font-size: 1.3rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+.td-arrow { display: flex; align-items: center; color: var(--primary); font-size: 1.4rem; font-weight: 700; }
+.td-clear {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 10px; cursor: pointer; color: var(--text2); font-size: 14px;
+  align-self: center;
+}
+.td-clear:hover { border-color: var(--danger); color: var(--danger); }
+
+/* Quick duration buttons */
+.quick-label {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px;
+}
+.quick-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.quick-btn {
+  padding: 7px 14px; border: 1px solid var(--border); background: var(--bg);
+  border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--text2);
+  cursor: pointer; transition: all .12s; font-family: inherit;
+}
+.quick-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.quick-btn:active { transform: scale(.96); }
+
+/* New slot grid - mobile friendly */
+.slot-grid-v2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+@media (min-width: 380px) { .slot-grid-v2 { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 600px) { .slot-grid-v2 { grid-template-columns: repeat(5, 1fr); } }
+@media (min-width: 900px) { .slot-grid-v2 { grid-template-columns: repeat(6, 1fr); } }
+
+.slot-v2 {
+  padding: 14px 4px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+  transition: all .12s;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  min-height: 44px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.slot-v2:hover:not(.slot-booked):not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+.slot-v2:active:not(.slot-booked):not(:disabled) { transform: scale(.96); }
+
+.slot-v2.slot-start {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(22,163,74,.3);
+}
+.slot-v2.slot-start::before {
+  content: 'START';
+  position: absolute;
+  top: 1px; left: 0; right: 0;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+.slot-v2.slot-end {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(22,163,74,.3);
+}
+.slot-v2.slot-end::before {
+  content: 'END';
+  position: absolute;
+  top: 1px; left: 0; right: 0;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+.slot-v2.slot-between {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-color: #bbf7d0;
+}
+[data-theme="dark"] .slot-v2.slot-between {
+  background: rgba(22,163,74,.15);
+  color: #86efac;
+  border-color: rgba(22,163,74,.3);
+}
+.slot-v2.slot-booked {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  opacity: .65;
+}
+[data-theme="dark"] .slot-v2.slot-booked {
+  background: rgba(185,28,28,.15);
+  color: #fca5a5;
+  border-color: rgba(185,28,28,.25);
+}
+.slot-v2:disabled { cursor: not-allowed; opacity: .4; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="ph-left">
+    <div class="ph-title">Create Booking</div>
+    <div class="ph-sub">Select turf, pick time slots, and confirm</div>
+  </div>
+  <a href="{% url 'booking_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+</div>
+
+<div class="row">
+  <!-- Left: Form -->
+  <div class="col" style="max-width:520px;">
+
+    <!-- Step 1: Turf + Date -->
+    <div class="card mb-16">
+      <div class="card-header"><span class="card-title">1. Turf & Date</span></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group mb-0">
+            <label>Turf *</label>
+            <select class="form-control" id="turfSelect" onchange="onTurfOrDateChange()">
+              <option value="">Select turf</option>
+              {% for t in turfs %}
+              <option value="{{ t.id }}" data-open="{{ t.open_time|time:'H:i' }}" data-close="{{ t.close_time|time:'H:i' }}" {% if preselect_turf == t.id|stringformat:"s" %}selected{% endif %}>{{ t.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group mb-0">
+            <label>Date *</label>
+            <input type="date" class="form-control" id="bookingDate" value="{{ today }}" min="{{ today }}" onchange="onTurfOrDateChange()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Time Slots -->
+    <div class="card mb-16">
+      <div class="card-header">
+        <span class="card-title">2. Select Time</span>
+        <span class="fs-12 text-muted" id="slotHint">Pick start time</span>
+      </div>
+      <div class="card-body">
+        <div id="slotLoading" style="text-align:center; padding:20px; color:var(--text3); font-size:13px;">Select a turf and date first</div>
+
+        <div id="slotPicker" style="display:none;">
+          <!-- Selected time display + clear -->
+          <div id="selectedDisplay" class="time-display" style="display:none;">
+            <div class="td-section">
+              <div class="td-label">START</div>
+              <div class="td-time" id="dispStart">--:--</div>
+            </div>
+            <div class="td-arrow">→</div>
+            <div class="td-section">
+              <div class="td-label">END</div>
+              <div class="td-time" id="dispEnd">--:--</div>
+            </div>
+            <button type="button" class="td-clear" onclick="clearTime()" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></button>
+          </div>
+
+          <!-- Quick duration shortcuts (after start picked) -->
+          <div id="quickDur" style="display:none; margin-bottom:12px;">
+            <div class="quick-label">Quick duration:</div>
+            <div class="quick-row">
+              <button type="button" class="quick-btn" onclick="setDuration(30)">30 min</button>
+              <button type="button" class="quick-btn" onclick="setDuration(60)">1 hr</button>
+              <button type="button" class="quick-btn" onclick="setDuration(90)">1.5 hr</button>
+              <button type="button" class="quick-btn" onclick="setDuration(120)">2 hr</button>
+              <button type="button" class="quick-btn" onclick="setDuration(180)">3 hr</button>
+            </div>
+          </div>
+
+          <!-- Slot grid -->
+          <div id="slotGrid" class="slot-grid-v2"></div>
+
+          <!-- Manual entry -->
+          <div class="mt-12" style="display:none;" id="manualTimeRow">
+            <div class="grid-2">
+              <div class="form-group mb-0">
+                <label>Start Time</label>
+                <input type="time" class="form-control" id="startTime" onchange="onManualTimeChange()">
+              </div>
+              <div class="form-group mb-0">
+                <label>End Time</label>
+                <input type="time" class="form-control" id="endTime" onchange="onManualTimeChange()">
+              </div>
+            </div>
+          </div>
+          <div class="mt-12" style="text-align:center;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="toggleManualTime()" id="manualBtn">
+              <i class="bi bi-keyboard"></i> Enter time manually
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Preview -->
+    <div id="overlapBox" class="overlap-box mb-16" style="display:none;">
+      <strong>⚠️ Slot Unavailable</strong> — This time is already booked. Please select a different slot.
+    </div>
+    <div id="priceBox" class="price-box mb-16" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div class="fs-12 text-muted mb-4" style="text-transform:uppercase; letter-spacing:.4px; font-weight:600;">Suggested Price</div>
+          <div class="price-big" id="suggestedPrice">₹0</div>
+          <div class="fs-12 text-muted mt-4" id="durationText"></div>
+        </div>
+        <div>
+          <label class="form-label" style="font-size:11px;">EDIT AMOUNT (₹)</label>
+          <input type="number" class="form-control" id="totalAmountInput" style="width:130px; font-size:14px; font-weight:700;" placeholder="Edit price">
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Customer -->
+    <div class="card mb-16">
+      <div class="card-header"><span class="card-title">3. Customer Details</span></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Phone *</label>
+            <input type="tel" class="form-control" id="phoneInput" placeholder="10-digit number" oninput="lookupCustomer(this.value)">
+          </div>
+          <div class="form-group">
+            <label>Customer Name *</label>
+            <input type="text" class="form-control" id="customerName" placeholder="Full name">
+          </div>
+        </div>
+        <div id="returnMsg" style="display:none; font-size:12.5px; background:var(--primary-light); border:1px solid #bbf7d0; padding:8px 11px; border-radius:7px; color:#14532d; margin-top:-6px;">
+          ✓ Returning customer — <strong id="returnName"></strong> (<span id="returnCount"></span> bookings)
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Payment -->
+    <div class="card mb-20">
+      <div class="card-header"><span class="card-title">4. Payment & Notes</span></div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Advance Payment (₹)</label>
+            <input type="number" class="form-control" id="advanceInput" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select class="form-control" id="paymentMethod">
+              <option value="cash">Cash</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card</option>
+              <option value="bank_transfer">Bank Transfer</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Booking Status</label>
+            <select class="form-control" id="bookingStatus">
+              <option value="booked">Booked</option>
+              <option value="hold">Hold</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <input type="text" class="form-control" id="bookingNotes" placeholder="Optional note">
+          </div>
+        </div>
+        <button type="button" id="submitBtn" onclick="submitBooking()" class="btn btn-primary" style="width:100%; padding:12px; font-size:14px;">
+          <i class="bi bi-check-lg"></i> Confirm Booking
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Info panel -->
+  <div style="width:260px; flex-shrink:0;" class="hide-mobile">
+    <div class="card p-0" style="position:sticky; top:78px;">
+      <div class="card-header"><span class="card-title">Quick Tips</span></div>
+      <div style="padding:16px; font-size:13px; color:var(--text2); line-height:1.7;">
+        <div class="mb-12">🟢 <strong>Green slots</strong> = available</div>
+        <div class="mb-12">🔴 <strong>Red slots</strong> = already booked</div>
+        <div class="mb-12">👆 Click first slot = start time<br>&nbsp;&nbsp;&nbsp;&nbsp;Click second slot = end time</div>
+        <div class="mb-12">💰 Price is auto-calculated from your pricing rules. You can edit it.</div>
+        <div>📱 Customer phone is checked — returning customers are auto-filled.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let bookedSlots = [];
+let selectedStart = null, selectedEnd = null;
+let manualMode = false;
+let allSlots = [];
+
+const turfSelect = document.getElementById('turfSelect');
+const dateInput = document.getElementById('bookingDate');
+
+// 12-hour helper
+function to12Hour(t24) {
+  if (!t24) return '--:--';
+  const [h, m] = t24.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+function onTurfOrDateChange() {
+  if (!turfSelect.value || !dateInput.value) return;
+  selectedStart = null; selectedEnd = null;
+  loadSlots();
+}
+
+function loadSlots() {
+  document.getElementById('slotLoading').style.display = 'block';
+  document.getElementById('slotPicker').style.display = 'none';
+  document.getElementById('priceBox').style.display = 'none';
+  document.getElementById('overlapBox').style.display = 'none';
+
+  fetch(`/ajax/slots/?turf_id=${turfSelect.value}&date=${dateInput.value}`)
+    .then(r => r.json()).then(d => {
+      bookedSlots = d.slots || [];
+      buildSlotGrid();
+      document.getElementById('slotLoading').style.display = 'none';
+      document.getElementById('slotPicker').style.display = 'block';
+    });
+}
+
+function isSlotBooked(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  const slotMin = h * 60 + m;
+  return bookedSlots.some(s => {
+    const [sh, sm] = s.start.split(':').map(Number);
+    const [eh, em] = s.end.split(':').map(Number);
+    return slotMin >= sh * 60 + sm && slotMin < eh * 60 + em;
+  });
+}
+
+function buildSlotGrid() {
+  const opt = turfSelect.options[turfSelect.selectedIndex];
+  const openH = parseInt((opt.dataset.open || '06:00').split(':')[0]);
+  const closeH = parseInt((opt.dataset.close || '23:00').split(':')[0]);
+
+  const grid = document.getElementById('slotGrid');
+  grid.innerHTML = '';
+  allSlots = [];
+
+  for (let h = openH; h < closeH; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const label = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+      allSlots.push(label);
+      const booked = isSlotBooked(label);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slot-v2' + (booked ? ' slot-booked' : '');
+      btn.textContent = to12Hour(label);
+      btn.dataset.time = label;
+      if (!booked) btn.onclick = () => onSlotClick(label);
+      grid.appendChild(btn);
+    }
+  }
+  // also add the closing time as a possible end
+  const closeLabel = String(closeH).padStart(2, '0') + ':00';
+  allSlots.push(closeLabel);
+
+  refreshSlotUI();
+}
+
+function onSlotClick(time) {
+  // Fresh start: pick start time
+  if (!selectedStart || (selectedStart && selectedEnd)) {
+    selectedStart = time;
+    selectedEnd = null;
+    document.getElementById('slotHint').textContent = 'Now pick end time (or use quick duration)';
+  }
+  // Pick end time
+  else if (selectedStart && !selectedEnd) {
+    if (time === selectedStart) {
+      selectedEnd = addMinutes(time, 30);
+    } else if (time < selectedStart) {
+      selectedStart = time;
+      selectedEnd = null;
+      document.getElementById('slotHint').textContent = 'Now pick end time';
+    } else {
+      selectedEnd = addMinutes(time, 30);
+    }
+  }
+  refreshSlotUI();
+  if (selectedStart && selectedEnd) syncAndPrice();
+}
+
+function setDuration(minutes) {
+  if (!selectedStart) {
+    showToast('Pick start time first', 'error');
+    return;
+  }
+  selectedEnd = addMinutes(selectedStart, minutes);
+  refreshSlotUI();
+  syncAndPrice();
+}
+
+// ✅ FIX: wraps around midnight (24:00 → 00:00) so end time stays valid
+function addMinutes(timeStr, minutes) {
+  const [h, m] = timeStr.split(':').map(Number);
+  let total = h * 60 + m + minutes;
+  total = ((total % 1440) + 1440) % 1440;
+  const nh = Math.floor(total / 60);
+  const nm = total % 60;
+  return String(nh).padStart(2, '0') + ':' + String(nm).padStart(2, '0');
+}
+
+// ✅ Helper: minutes between two times, treating end<=start as next day
+function minutesBetween(start, end) {
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let s = sh * 60 + sm;
+  let e = eh * 60 + em;
+  if (e <= s) e += 1440; // crosses midnight
+  return e - s;
+}
+
+function refreshSlotUI() {
+  document.querySelectorAll('.slot-v2').forEach(btn => {
+    btn.classList.remove('slot-start', 'slot-end', 'slot-between');
+    if (btn.classList.contains('slot-booked')) return;
+    const t = btn.dataset.time;
+    if (selectedStart && t === selectedStart) btn.classList.add('slot-start');
+    if (selectedEnd) {
+      const endMinusOne = addMinutes(selectedEnd, -30);
+      if (t === endMinusOne && t !== selectedStart) btn.classList.add('slot-end');
+      else if (selectedStart && t > selectedStart && t < endMinusOne) btn.classList.add('slot-between');
+    }
+  });
+
+  const disp = document.getElementById('selectedDisplay');
+  const quick = document.getElementById('quickDur');
+  if (selectedStart) {
+    disp.style.display = 'flex';
+    document.getElementById('dispStart').textContent = to12Hour(selectedStart);
+    document.getElementById('dispEnd').textContent = selectedEnd ? to12Hour(selectedEnd) : '--:--';
+    quick.style.display = selectedStart && !selectedEnd ? 'block' : 'none';
+  } else {
+    disp.style.display = 'none';
+    quick.style.display = 'none';
+  }
+
+  const hint = document.getElementById('slotHint');
+  if (selectedStart && selectedEnd) {
+    hint.textContent = `${to12Hour(selectedStart)} → ${to12Hour(selectedEnd)}`;
+  } else if (selectedStart) {
+    hint.textContent = 'Pick end time or use quick duration';
+  } else {
+    hint.textContent = 'Pick start time';
+  }
+}
+
+function clearTime() {
+  selectedStart = null;
+  selectedEnd = null;
+  document.getElementById('startTime').value = '';
+  document.getElementById('endTime').value = '';
+  document.getElementById('priceBox').style.display = 'none';
+  document.getElementById('overlapBox').style.display = 'none';
+  refreshSlotUI();
+}
+
+function syncAndPrice() {
+  document.getElementById('startTime').value = selectedStart;
+  document.getElementById('endTime').value = selectedEnd;
+  fetchPrice();
+}
+
+function toggleManualTime() {
+  manualMode = !manualMode;
+  document.getElementById('manualTimeRow').style.display = manualMode ? 'block' : 'none';
+  document.getElementById('manualBtn').innerHTML = manualMode
+    ? '<i class="bi bi-x-lg"></i> Hide manual entry'
+    : '<i class="bi bi-keyboard"></i> Enter time manually';
+}
+
+function onManualTimeChange() {
+  const s = document.getElementById('startTime').value;
+  const e = document.getElementById('endTime').value;
+  if (s) selectedStart = s;
+  if (e) selectedEnd = e;
+  refreshSlotUI();
+  if (selectedStart && selectedEnd) fetchPrice();
+}
+
+function fetchPrice() {
+  const tid = turfSelect.value, date = dateInput.value;
+  if (!tid || !date || !selectedStart || !selectedEnd) return;
+  fetch(`/ajax/price/?turf_id=${tid}&date=${date}&start=${selectedStart}&end=${selectedEnd}`)
+    .then(r => r.json()).then(d => {
+      if (d.error) { showToast(d.error, 'error'); return; }
+      if (d.overlap) {
+        document.getElementById('overlapBox').style.display = 'block';
+        document.getElementById('priceBox').style.display = 'none';
+      } else {
+        document.getElementById('overlapBox').style.display = 'none';
+        document.getElementById('priceBox').style.display = 'block';
+        document.getElementById('suggestedPrice').textContent = '₹' + Math.round(d.price).toLocaleString('en-IN');
+        document.getElementById('totalAmountInput').value = Math.round(d.price);
+        // ✅ Midnight-aware duration
+        const [sh, sm] = selectedStart.split(':').map(Number);
+        const [eh, em] = selectedEnd.split(':').map(Number);
+        let mins = (eh * 60 + em) - (sh * 60 + sm);
+        if (mins <= 0) mins += 1440;  // crosses midnight
+        const h = Math.floor(mins / 60), m = mins % 60;
+        const overnight = (eh * 60 + em) <= (sh * 60 + sm) ? ' (next day)' : '';
+        document.getElementById('durationText').textContent = (h ? h + 'h ' : '') + (m ? m + 'm' : '') + ' duration' + overnight;
+      }
+    });
+}
+
+let phoneTimer;
+function lookupCustomer(phone) {
+  clearTimeout(phoneTimer);
+  if (phone.length < 10) { document.getElementById('returnMsg').style.display='none'; return; }
+  phoneTimer = setTimeout(() => {
+    fetch(`/ajax/customer/?phone=${phone}`)
+      .then(r => r.json()).then(d => {
+        if (d.found) {
+          document.getElementById('customerName').value = d.name;
+          document.getElementById('returnName').textContent = d.name;
+          document.getElementById('returnCount').textContent = d.bookings;
+          document.getElementById('returnMsg').style.display = 'block';
+        } else {
+          document.getElementById('returnMsg').style.display = 'none';
+        }
+      });
+  }, 350);
+}
+
+function submitBooking() {
+  const tid = turfSelect.value, date = dateInput.value;
+  const start = selectedStart || document.getElementById('startTime').value;
+  const end = selectedEnd || document.getElementById('endTime').value;
+  const phone = document.getElementById('phoneInput').value.trim();
+  const name = document.getElementById('customerName').value.trim();
+  const amount = document.getElementById('totalAmountInput').value;
+
+  if (!tid) { showToast('Select a turf', 'error'); return; }
+  if (!date) { showToast('Select a date', 'error'); return; }
+  if (!start || !end) { showToast('Select time slot', 'error'); return; }
+  if (!phone) { showToast('Enter phone number', 'error'); return; }
+  if (!name) { showToast('Enter customer name', 'error'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+
+  const fd = new FormData();
+  fd.append('turf_id', tid); fd.append('booking_date', date);
+  fd.append('start_time', start); fd.append('end_time', end);
+  fd.append('phone', phone); fd.append('customer_name', name);
+  fd.append('total_amount', amount || '');
+  fd.append('advance_payment', document.getElementById('advanceInput').value || '0');
+  fd.append('payment_method', document.getElementById('paymentMethod').value);
+  fd.append('status', document.getElementById('bookingStatus').value);
+  fd.append('notes', document.getElementById('bookingNotes').value);
+  fd.append('csrfmiddlewaretoken', getCsrf());
+
+  fetch('/bookings/create/', { method: 'POST', body: fd })
+    .then(r => r.json()).then(d => {
+      if (d.success) {
+        showToast('Booking created! ₹' + Math.round(d.total).toLocaleString('en-IN'), 'success');
+        setTimeout(() => window.location = '/bookings/' + d.booking_id + '/', 900);
+      } else {
+        showToast(d.error || 'Error creating booking', 'error');
+        btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg"></i> Confirm Booking';
+      }
+    });
+}
+
+// Pre-fill phone if passed
+{% if preselect_phone %}
+document.getElementById('phoneInput').value = '{{ preselect_phone }}';
+lookupCustomer('{{ preselect_phone }}');
+{% endif %}
+
+// Init if turf preselected
+if (document.getElementById('turfSelect').value) onTurfOrDateChange();
+</script>
+{% endblock %}

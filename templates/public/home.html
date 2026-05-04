@@ -1,0 +1,241 @@
+{% extends 'public/_base.html' %}
+{% block title %}TurfPro — Smart Turf Booking & Management for India{% endblock %}
+
+{% block extra_css %}
+.hero {
+  padding: 120px 24px 60px;
+  background: radial-gradient(ellipse at top, rgba(22,163,74,.08), transparent 60%),
+              linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(22,163,74,.15), transparent 70%);
+  border-radius: 50%;
+}
+.hero-inner { max-width: 1100px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--primary-light); color: var(--primary-dark);
+  padding: 7px 16px; border-radius: 30px;
+  font-size: 13px; font-weight: 600;
+  margin-bottom: 26px;
+}
+.hero h1 {
+  font-size: clamp(2rem, 5.5vw, 3.6rem);
+  font-weight: 800; line-height: 1.12;
+  letter-spacing: -1.2px; margin-bottom: 22px;
+  background: linear-gradient(135deg, #0f172a 0%, #16a34a 70%, #15803d 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  color: var(--text2);
+  max-width: 650px; margin: 0 auto 36px;
+}
+.hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+.hero-trust {
+  display: flex; gap: 22px; justify-content: center; flex-wrap: wrap;
+  font-size: 13px; color: var(--text3); font-weight: 500;
+}
+.hero-trust i { color: var(--primary); margin-right: 4px; }
+
+/* Preview */
+.preview {
+  max-width: 980px; margin: 60px auto 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  background: white;
+}
+.preview-bar { background: linear-gradient(135deg, #f8fafc, #ffffff); height: 32px; border-bottom: 1px solid var(--border); position: relative; }
+.preview-bar::after { content: '⬤  ⬤  ⬤'; position: absolute; top: 6px; left: 16px; color: #cbd5e1; font-size: 11px; letter-spacing: 6px; }
+.preview-img {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  padding: 50px 36px;
+}
+.demo-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; text-align: left; }
+.demo-stat { background: white; border-radius: 11px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.05); }
+.demo-stat-l { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; }
+.demo-stat-v { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-top: 4px; }
+.demo-stat-v.green { color: var(--primary); }
+.demo-chart { background: white; border-radius: 11px; padding: 22px; box-shadow: 0 2px 6px rgba(0,0,0,.05); text-align: left; }
+.demo-chart-t { font-weight: 700; font-size: 13px; margin-bottom: 16px; }
+.demo-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
+.demo-bar { flex: 1; background: linear-gradient(180deg, var(--primary), #86efac); border-radius: 4px; }
+@media (max-width: 700px) { .demo-stats { grid-template-columns: 1fr 1fr; } .preview-img { padding: 30px 20px; } }
+
+/* Features grid */
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+@media (max-width: 900px) { .features { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+.feature {
+  background: white; border: 1px solid var(--border); border-radius: 14px;
+  padding: 28px 24px; transition: all .22s;
+}
+.feature:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.feature-icon {
+  width: 48px; height: 48px;
+  background: var(--primary-light); color: var(--primary); border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 18px;
+}
+.feature h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.feature p { font-size: 14px; color: var(--text2); }
+
+/* Steps */
+.steps-section { background: var(--bg-soft); }
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 800px) { .steps-grid { grid-template-columns: 1fr; } }
+.step {
+  background: white; border: 1px solid var(--border); border-radius: 14px;
+  padding: 30px 24px; text-align: center; position: relative;
+}
+.step-num {
+  position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  width: 38px; height: 38px;
+  background: var(--primary); color: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; border: 4px solid var(--bg-soft);
+}
+.step h3 { font-size: 1.1rem; font-weight: 700; margin: 14px 0 8px; }
+.step p { font-size: 14px; color: var(--text2); }
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge fade-up">⚡ Built for Indian turf owners</div>
+    <h1 class="fade-up">The smartest way to manage<br>your turf bookings</h1>
+    <p class="fade-up-delay">From bookings to payments to analytics — everything in one place. Hindi & English support, dynamic pricing, AI-powered chat assistant. Setup in 5 minutes.</p>
+    <div class="hero-ctas fade-up-delay-2">
+      <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+        <i class="bi bi-rocket-takeoff-fill"></i> Start Free Today
+      </a>
+      <a href="{% url 'features_page' %}" class="btn btn-ghost btn-lg" style="border:1px solid var(--border);">
+        See Features
+      </a>
+    </div>
+    <div class="hero-trust fade-up-delay-2">
+      <span><i class="bi bi-check-circle-fill"></i> No credit card</span>
+      <span><i class="bi bi-check-circle-fill"></i> 5-min setup</span>
+      <span><i class="bi bi-check-circle-fill"></i> Hindi support</span>
+    </div>
+
+    <div class="preview fade-up-delay-2">
+      <div class="preview-bar"></div>
+      <div class="preview-img">
+        <div class="demo-stats">
+          <div class="demo-stat"><div class="demo-stat-l">Today's Revenue</div><div class="demo-stat-v green">₹4,250</div></div>
+          <div class="demo-stat"><div class="demo-stat-l">Bookings</div><div class="demo-stat-v">12</div></div>
+          <div class="demo-stat"><div class="demo-stat-l">Pending</div><div class="demo-stat-v">₹800</div></div>
+          <div class="demo-stat"><div class="demo-stat-l">Customers</div><div class="demo-stat-v">48</div></div>
+        </div>
+        <div class="demo-chart">
+          <div class="demo-chart-t">Daily Revenue · Last 7 days</div>
+          <div class="demo-bars">
+            <div class="demo-bar" style="height:50%;"></div>
+            <div class="demo-bar" style="height:75%;"></div>
+            <div class="demo-bar" style="height:62%;"></div>
+            <div class="demo-bar" style="height:88%;"></div>
+            <div class="demo-bar" style="height:45%;"></div>
+            <div class="demo-bar" style="height:95%;"></div>
+            <div class="demo-bar" style="height:70%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">Features</div>
+      <h2>Everything you need to run your turf</h2>
+      <p>Powerful tools that make managing bookings, payments, and customers effortless.</p>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon"><i class="bi bi-calendar-check-fill"></i></div>
+        <h3>Smart Booking</h3>
+        <p>Click-grid time slots, midnight crossing bookings, automatic conflict detection.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="bi bi-tags-fill"></i></div>
+        <h3>Dynamic Pricing</h3>
+        <p>Different rates for weekends, evenings, holidays. Multipliers or fixed prices.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="bi bi-chat-dots-fill"></i></div>
+        <h3>AI Chat Assistant</h3>
+        <p>Ask in Hindi or English. Get instant answers about bookings, revenue, and more.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="bi bi-currency-rupee"></i></div>
+        <h3>Payment Tracking</h3>
+        <p>Track advance, dues, full payments. UPI, Cash, Card — all methods supported.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="bi bi-bar-chart-line-fill"></i></div>
+        <h3>Real Analytics</h3>
+        <p>Revenue trends, peak hours, top customers, turf utilization — all visualized.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="bi bi-phone-fill"></i></div>
+        <h3>Mobile First</h3>
+        <p>Manage your turf on the go. Beautiful dark mode, lightning fast on any phone.</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="{% url 'features_page' %}" class="btn btn-ghost" style="border:1px solid var(--border);">
+        Explore All Features <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="steps-section">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-tag">Get Started</div>
+      <h2>Up and running in 3 simple steps</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Create Account</h3>
+        <p>Sign up free in 30 seconds. No credit card required.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Add Your Turfs</h3>
+        <p>Set hours, default rates, pricing rules for each turf.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Start Booking</h3>
+        <p>Take bookings, track payments, grow your business.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-inner cta-inner">
+    <h2>Ready to upgrade your turf business?</h2>
+    <p>Join other turf owners who switched to a simpler, smarter way of managing their business.</p>
+    <a href="{% url 'register' %}" class="btn btn-white btn-lg">
+      <i class="bi bi-rocket-takeoff-fill"></i> Get Started Free
+    </a>
+  </div>
+</section>
+{% endblock %}

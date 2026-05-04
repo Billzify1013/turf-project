@@ -1,0 +1,229 @@
+{% extends 'public/_base.html' %}
+{% block title %}Contact — TurfPro{% endblock %}
+
+{% block extra_css %}
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1.3fr;
+  gap: 40px; max-width: 950px; margin: 0 auto;
+  align-items: start;
+}
+@media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; } }
+.contact-info-card {
+  background: linear-gradient(135deg, var(--primary-light), #f0fdf4);
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+  padding: 28px;
+}
+.contact-info-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+.contact-info-card > p { color: var(--text2); margin-bottom: 24px; font-size: 14px; }
+.ci-method {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(187,247,208,.6);
+}
+.ci-method:last-child { border-bottom: none; }
+.ci-icon {
+  width: 36px; height: 36px;
+  background: white;
+  color: var(--primary);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.ci-content { min-width: 0; flex: 1; }
+.ci-content h4 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.ci-content p { font-size: 13.5px; color: var(--text2); word-break: break-word; }
+
+.contact-form-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+}
+.contact-form-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+.contact-form-card > p { color: var(--text2); margin-bottom: 22px; font-size: 14px; }
+.cf-group { margin-bottom: 16px; }
+.cf-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+.cf-input {
+  width: 100%;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  transition: all .15s;
+}
+.cf-input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(22,163,74,.12); }
+textarea.cf-input { resize: vertical; min-height: 120px; }
+.cf-submit { width: 100%; padding: 13px; font-size: 15px; justify-content: center; }
+.cf-success {
+  background: var(--primary-light);
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 14px;
+  display: none;
+}
+.cf-success.show { display: block; }
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <div class="section-tag fade-up">Contact Us</div>
+    <h1 class="fade-up">We'd love to <span>hear from you</span></h1>
+    <p class="fade-up-delay">Question, feedback, or just want to chat? Drop us a message — we reply within 24 hours.</p>
+  </div>
+</section>
+
+<section style="padding-top:30px;">
+  <div class="section-inner">
+    <div class="contact-grid">
+
+      <!-- Info side -->
+      <div class="contact-info-card">
+        <h3>Get in touch</h3>
+        <p>We're here to help. Pick whichever way is easiest for you.</p>
+
+        <div class="ci-method">
+          <div class="ci-icon"><i class="bi bi-envelope-fill"></i></div>
+          <div class="ci-content">
+            <h4>Email</h4>
+            <p><a href="mailto:hello@turfpro.in" style="color:var(--primary);">hello@turfpro.in</a></p>
+          </div>
+        </div>
+
+        <div class="ci-method">
+          <div class="ci-icon"><i class="bi bi-whatsapp"></i></div>
+          <div class="ci-content">
+            <h4>WhatsApp</h4>
+            <p>Coming soon — we'll add it once we hit 50 owners.</p>
+          </div>
+        </div>
+
+        <div class="ci-method">
+          <div class="ci-icon"><i class="bi bi-clock"></i></div>
+          <div class="ci-content">
+            <h4>Response Time</h4>
+            <p>Usually within 24 hours. Often faster.</p>
+          </div>
+        </div>
+
+        <div class="ci-method">
+          <div class="ci-icon"><i class="bi bi-geo-alt-fill"></i></div>
+          <div class="ci-content">
+            <h4>Based In</h4>
+            <p>Made with ❤️ in India. Remote team, customers everywhere.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form side -->
+      <div class="contact-form-card">
+        <h3>Send us a message</h3>
+        <p>Tell us what's on your mind, we'll get back fast.</p>
+
+        <form id="contactForm" onsubmit="return submitContact(event);">
+          {% csrf_token %}
+          <div class="cf-group">
+            <label for="cfName">Your Name</label>
+            <input type="text" id="cfName" name="name" class="cf-input" required>
+          </div>
+          <div class="cf-group">
+            <label for="cfEmail">Email</label>
+            <input type="email" id="cfEmail" name="email" class="cf-input" required>
+          </div>
+          <div class="cf-group">
+            <label for="cfPhone">Phone (optional)</label>
+            <input type="tel" id="cfPhone" name="phone" class="cf-input" placeholder="10-digit number">
+          </div>
+          <div class="cf-group">
+            <label for="cfSubject">Subject</label>
+            <select id="cfSubject" name="subject" class="cf-input" required>
+              <option value="">Select one...</option>
+              <option>General question</option>
+              <option>Demo request</option>
+              <option>Pricing inquiry</option>
+              <option>Bug report</option>
+              <option>Feature request</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="cf-group">
+            <label for="cfMessage">Message</label>
+            <textarea id="cfMessage" name="message" class="cf-input" placeholder="What can we help you with?" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary cf-submit" id="cfSubmit">
+            <i class="bi bi-send-fill"></i> Send Message
+          </button>
+          <div class="cf-success" id="cfSuccess">
+            ✓ Got it! We'll reply to your email within 24 hours.
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-inner cta-inner">
+    <h2>Or just try it yourself</h2>
+    <p>The fastest way to know if TurfPro is for you — sign up free and play with it.</p>
+    <a href="{% url 'register' %}" class="btn btn-white btn-lg">Sign Up Free</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCsrfFromForm() {
+  const t = document.querySelector('[name=csrfmiddlewaretoken]');
+  return t ? t.value : '';
+}
+
+function submitContact(e) {
+  e.preventDefault();
+  const btn = document.getElementById('cfSubmit');
+  btn.disabled = true;
+  btn.innerHTML = 'Sending...';
+
+  const fd = new FormData(document.getElementById('contactForm'));
+  fetch('{% url "contact_page" %}', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': getCsrfFromForm() },
+    body: fd,
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        document.getElementById('contactForm').reset();
+        document.getElementById('cfSuccess').classList.add('show');
+        btn.innerHTML = '<i class="bi bi-check-lg"></i> Sent';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-send-fill"></i> Send Message';
+        }, 4000);
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send-fill"></i> Send Message';
+        alert(d.error || 'Something went wrong. Try again.');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-send-fill"></i> Send Message';
+      alert('Network error. Please try again.');
+    });
+  return false;
+}
+</script>
+{% endblock %}
