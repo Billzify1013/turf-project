@@ -1,7 +1,5 @@
 from django.urls import path
 from . import chat_views, views
-from django.contrib.sitemaps.views import sitemap
-from django.contrib.sitemaps import Sitemap
 from bookings.models import Turf
 
 urlpatterns = [
@@ -47,21 +45,3 @@ urlpatterns = [
 ]
 
 
-class TurfSitemap(Sitemap):
-    changefreq = 'weekly'
-    priority = 0.9
-    
-    def items(self):
-        return Turf.objects.filter(is_active=True)
-    
-    def lastmod(self, obj):
-        return obj.created_at if hasattr(obj, 'created_at') else None
-
-sitemaps = {
-    'turfs': TurfSitemap,
-}
-
-
-urlpatterns += [
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
-]
