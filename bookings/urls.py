@@ -2,7 +2,7 @@ from django.urls import path
 from . import chat_views, views
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import Sitemap
-from bookings.models import Turf, Booking
+from bookings.models import Turf
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
