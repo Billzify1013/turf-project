@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'bookings',
+    'django.contrib.sites',  # ← ADD
+    'django.contrib.sitemaps',  # ← ADD
 ]
 
 MIDDLEWARE = [
@@ -105,3 +107,5 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+SITE_ID = 1
