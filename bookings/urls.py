@@ -42,6 +42,9 @@ urlpatterns = [
 
     # Voice assistant
     path('chat/process/', chat_views.chat_process, name='chat_process'),
+
+
+    path('robots.txt', views.robots_txt, name='robots_txt'),
 ]
 
 

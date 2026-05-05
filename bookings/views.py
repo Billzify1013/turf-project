@@ -10,6 +10,19 @@ import json
 from .models import Turf, Booking, Customer, Payment, PricingRule, BookingLog
 from .pricing import calculate_price, check_overlap
 
+
+
+from django.http import HttpResponse
+
+def robots_txt(request):
+    content = """User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://turfsys.com/sitemap.xml"""
+    return HttpResponse(content, content_type='text/plain')
+
 def landing(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
