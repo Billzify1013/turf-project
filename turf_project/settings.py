@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'turfpro-secret-change-in-production-xk92pla'
 # DEBUG = True
 DEBUG = False
-ALLOWED_HOSTS = ['92.4.70.136', 'turf.hotelfortuneayodhya.com', 'turf.billzify.com', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','92.4.70.136', 'turf.hotelfortuneayodhya.com', 'turf.billzify.com']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok-free.app",
@@ -98,3 +98,10 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# ── STATIC FILES ──
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]

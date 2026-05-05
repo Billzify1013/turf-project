@@ -39,6 +39,57 @@
 }
 .stat-lbl { font-size: 12px; color: var(--text2); margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
 .about-stats-card { text-align: center; }
+
+.billzify-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 18px;
+  padding: 36px 28px;
+  margin: 40px 0;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+}
+.billzify-banner::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+.billzify-banner h3 {
+  position: relative; z-index: 1;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+.billzify-banner p {
+  position: relative; z-index: 1;
+  font-size: 15px;
+  opacity: .95;
+  max-width: 600px;
+  margin: 0;
+  line-height: 1.6;
+}
+.billzify-link {
+  position: relative; z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.15);
+  transition: all .15s;
+}
+.billzify-link:hover {
+  background: rgba(255,255,255,.25);
+}
 {% endblock %}
 
 {% block content %}
@@ -66,6 +117,19 @@
         <div style="font-size:1.2rem; font-weight:700; margin-bottom:8px;">Our Mission</div>
         <p style="color:var(--text2); font-size:14px;">Empower every Indian turf owner with software that's simple, smart, and speaks their language. No bloat, no jargon, just tools that work.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Billzify Connection -->
+<section>
+  <div class="section-inner">
+    <div class="billzify-banner">
+      <h3>🚀 Part of the Billzify ecosystem</h3>
+      <p>TurfPro is a flagship product from <a href="https://billzify.com" target="_blank" rel="noopener" style="color:white; font-weight:700; text-decoration:underline;">Billzify</a>, a fintech & SaaS company building tools for Indian businesses. All intellectual property, trademarks, and operational rights belong to Billzify. We've invested in TurfPro because we believe turf owners deserve world-class booking software — and we're committed to making that happen.</p>
+      <a href="https://billzify.com" target="_blank" rel="noopener" class="billzify-link">
+        Learn more about Billzify <i class="bi bi-arrow-right"></i>
+      </a>
     </div>
   </div>
 </section>
@@ -140,7 +204,7 @@
 <section class="cta">
   <div class="section-inner cta-inner">
     <h2>Join the TurfPro family</h2>
-    <p>Built with care, used by Indian turf owners every day.</p>
+    <p>Built with care, backed by Billzify, used by Indian turf owners every day.</p>
     <a href="{% url 'register' %}" class="btn btn-white btn-lg">Get Started Free</a>
   </div>
 </section>
