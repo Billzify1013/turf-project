@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'turfpro-secret-change-in-production-xk92pla'
 # DEBUG = True
 DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','92.4.70.136', 'turf.hotelfortuneayodhya.com', 'turf.billzify.com','www.turfsys.com',]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','92.4.70.136', 'turfsys.com', 'www.turfsys.com', 'turf.hotelfortuneayodhya.com', 'turf.billzify.com']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok-free.app",
