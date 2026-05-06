@@ -1,0 +1,234 @@
+{% extends 'public/_base.html' %}
+{% block title %}Blog — Turf Business Insights, Tips & Industry Trends | TurfSys{% endblock %}
+
+{% block extra_css %}
+.blog-hero {
+  padding: 110px 24px 50px;
+  background: radial-gradient(ellipse at top, rgba(22,163,74,.08), transparent 60%),
+              linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  text-align: center;
+}
+.blog-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 14px;
+}
+.blog-hero h1 span {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.blog-hero p {
+  font-size: 1.05rem;
+  color: var(--text2);
+  max-width: 640px;
+  margin: 0 auto 26px;
+}
+
+.featured-post {
+  max-width: 1100px;
+  margin: 50px auto 0;
+  padding: 0 24px;
+}
+.featured-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  transition: all .22s;
+  text-decoration: none;
+  color: inherit;
+}
+.featured-card:hover { transform: translateY(-4px); box-shadow: 0 30px 60px rgba(0,0,0,.12); }
+@media (max-width: 800px) { .featured-card { grid-template-columns: 1fr; } }
+.featured-cover {
+  background: linear-gradient(135deg, var(--primary-light), #f0fdf4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8rem;
+  min-height: 280px;
+}
+.featured-content { padding: 38px 36px; display: flex; flex-direction: column; justify-content: center; }
+.featured-tag {
+  background: var(--primary); color: white;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: .8px;
+  width: fit-content; margin-bottom: 14px; text-transform: uppercase;
+}
+.featured-title {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800; letter-spacing: -.5px; line-height: 1.2;
+  margin-bottom: 12px;
+}
+.featured-excerpt { color: var(--text2); font-size: 15px; margin-bottom: 18px; line-height: 1.55; }
+.featured-meta { display: flex; gap: 18px; font-size: 13px; color: var(--text3); }
+.featured-meta span { display: flex; align-items: center; gap: 5px; }
+
+.posts-section {
+  max-width: 1100px;
+  margin: 60px auto 0;
+  padding: 0 24px;
+}
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+@media (max-width: 900px) { .posts-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .posts-grid { grid-template-columns: 1fr; } }
+.post-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all .22s;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.post-cover {
+  background: linear-gradient(135deg, var(--primary-light), #f0fdf4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem;
+  height: 160px;
+  border-bottom: 1px solid #bbf7d0;
+}
+.post-body {
+  padding: 22px 22px 24px;
+  display: flex; flex-direction: column; flex-grow: 1;
+}
+.post-cat {
+  font-size: 11px; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.post-title {
+  font-size: 1.05rem; font-weight: 700;
+  letter-spacing: -.3px; line-height: 1.35;
+  margin-bottom: 10px; color: var(--text);
+}
+.post-excerpt {
+  font-size: 13.5px; color: var(--text2);
+  line-height: 1.55; margin-bottom: 16px; flex-grow: 1;
+}
+.post-meta {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text3);
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+
+.newsletter {
+  max-width: 720px;
+  margin: 60px auto;
+  padding: 36px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 18px;
+  text-align: center;
+  color: white;
+}
+.newsletter h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+.newsletter p { opacity: .92; font-size: 14.5px; max-width: 460px; margin: 0 auto 22px; }
+{% endblock %}
+
+{% block content %}
+<section class="blog-hero">
+  <div class="page-hero-inner">
+    <div class="section-tag fade-up">TurfSys Blog</div>
+    <h1 class="fade-up">Insights for the <span>turf industry</span></h1>
+    <p class="fade-up-delay">Strategy, marketing, technology, and operations — practical guides to help you grow your sports facility business worldwide.</p>
+  </div>
+</section>
+
+<!-- Featured Post -->
+<section class="featured-post">
+  <a href="{% url 'blog_post_1' %}" class="featured-card">
+    <div class="featured-cover">🏟️</div>
+    <div class="featured-content">
+      <div class="featured-tag">Featured · Business Guide</div>
+      <h2 class="featured-title">How to Start a Profitable Turf Business in 2026 — Complete Guide</h2>
+      <p class="featured-excerpt">From land selection and construction costs to revenue projections and marketing — everything you need to know about launching a successful sports turf facility.</p>
+      <div class="featured-meta">
+        <span><i class="bi bi-clock"></i> 12 min read</span>
+        <span><i class="bi bi-calendar"></i> May 2026</span>
+        <span><i class="bi bi-bookmark"></i> Business Guide</span>
+      </div>
+    </div>
+  </a>
+</section>
+
+<!-- Posts Grid -->
+<section class="posts-section">
+  <div class="posts-grid">
+
+    <a href="{% url 'blog_post_2' %}" class="post-card">
+      <div class="post-cover">💰</div>
+      <div class="post-body">
+        <div class="post-cat">Pricing Strategy</div>
+        <h3 class="post-title">Dynamic Pricing for Turf Facilities — Maximize Revenue with Smart Rates</h3>
+        <p class="post-excerpt">Learn how peak-hour multipliers, weekend premiums, and seasonal pricing can boost your turf revenue by 30-40% without losing customers.</p>
+        <div class="post-meta">
+          <span>8 min read</span>
+          <span>May 2026</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="{% url 'blog_post_3' %}" class="post-card">
+      <div class="post-cover">📈</div>
+      <div class="post-body">
+        <div class="post-cat">Growth</div>
+        <h3 class="post-title">10 Proven Strategies to Increase Turf Bookings in 2026</h3>
+        <p class="post-excerpt">From referral programs to corporate partnerships — actionable tactics that have helped facilities double their bookings within six months.</p>
+        <div class="post-meta">
+          <span>9 min read</span>
+          <span>May 2026</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="{% url 'blog_post_4' %}" class="post-card">
+      <div class="post-cover">⚙️</div>
+      <div class="post-body">
+        <div class="post-cat">Technology</div>
+        <h3 class="post-title">The Complete Guide to Turf Management Software</h3>
+        <p class="post-excerpt">What features actually matter, how to evaluate vendors, and the real cost of running a turf without a booking system.</p>
+        <div class="post-meta">
+          <span>10 min read</span>
+          <span>May 2026</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="{% url 'blog_post_5' %}" class="post-card">
+      <div class="post-cover">📱</div>
+      <div class="post-body">
+        <div class="post-cat">Marketing</div>
+        <h3 class="post-title">Marketing Your Turf Facility — Digital Strategies That Actually Work</h3>
+        <p class="post-excerpt">Instagram, Google Maps, WhatsApp groups, local SEO — a no-fluff playbook for filling your booking calendar through digital channels.</p>
+        <div class="post-meta">
+          <span>11 min read</span>
+          <span>May 2026</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section>
+  <div class="newsletter">
+    <h3>📧 Stay updated</h3>
+    <p>Get the latest articles, industry trends, and turf business strategies delivered to your inbox.</p>
+    <a href="mailto:info@billzify.com?subject=Subscribe to TurfSys Blog" class="btn btn-white btn-lg">Subscribe</a>
+  </div>
+</section>
+{% endblock %}

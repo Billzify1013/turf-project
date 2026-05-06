@@ -2,9 +2,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  {% block meta %}
+<meta name="description" content="TurfSys — India's smartest turf booking & management software. Free forever. Built for Indian turf owners with Hindi support, dynamic pricing, AI chat assistant.">
+<meta name="keywords" content="turf booking software, turf management india, sports booking system, free turf software, hindi turf app, cricket turf booking, football turf management, sports facility booking">
+<meta name="author" content="Billzify">
+
+<!-- Open Graph (Facebook, WhatsApp share) -->
+<meta property="og:title" content="TurfSys — Smart Turf Management for India">
+<meta property="og:description" content="Free turf booking software with Hindi support. Built for Indian turf owners.">
+<meta property="og:image" content="https://turfsys.com/static/images/logo.png">
+<meta property="og:url" content="https://turfsys.com">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TurfSys — Smart Turf Management">
+<meta name="twitter:description" content="Free turf booking software for India">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://turfsys.com{{ request.path }}">
+{% endblock %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TurfSys",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "INR"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "ratingCount": "10"
+  },
+  "description": "Free turf booking and management software for India",
+  "url": "https://turfsys.com"
+}
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}TurfPro — Smart Turf Booking & Management for India{% endblock %}</title>
+<title>{% block title %}TurfSys — Smart Turf Booking & Management for India{% endblock %}</title>
 <meta name="description" content="{% block description %}Manage your turf bookings, customers, payments, and revenue all in one place. Built for Indian turf owners.{% endblock %}">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -332,6 +376,7 @@ section { padding: 80px 24px; }
       <a href="{% url 'pricing_page' %}" class="nav-link {% if request.resolver_match.url_name == 'pricing_page' %}active{% endif %}">Pricing</a>
       <a href="{% url 'about_page' %}" class="nav-link {% if request.resolver_match.url_name == 'about_page' %}active{% endif %}">About</a>
       <a href="{% url 'contact_page' %}" class="nav-link {% if request.resolver_match.url_name == 'contact_page' %}active{% endif %}">Contact</a>
+      <a href="{% url 'blog_list' %}" class="nav-link {% if 'blog' in request.path %}active{% endif %}">Blog</a>
     </div>
     <div class="nav-actions">
       <a href="{% url 'login' %}" class="btn btn-ghost">Login</a>
@@ -373,7 +418,7 @@ section { padding: 80px 24px; }
       </div>
       <div class="footer-col">
         <h4>Support</h4>
-        <a href="mailto:hello@turfpro.in">Email Us</a>
+        <a href="mailto:info@billzify.com">Email Us</a>
         <a href="{% url 'contact_page' %}">Help Center</a>
       </div>
     </div>

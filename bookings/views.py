@@ -881,3 +881,26 @@ def booked_slots(request):
         ]})
     except Exception as e:
         return JsonResponse({'error': str(e)})
+
+
+
+
+# seo working functions
+def blog_list(request):
+    return render(request, 'public/blog_list.html')
+
+
+def blog_post_1(request):
+    return render(request, 'public/blog/post_1.html')
+
+def blog_post_2(request):
+    return render(request, 'public/blog/post_2.html')
+
+def blog_post_3(request):
+    return render(request, 'public/blog/post_3.html')
+
+def blog_post_4(request):
+    return render(request, 'public/blog/post_4.html')
+
+def blog_post_5(request):
+    return render(request, 'public/blog/post_5.html')

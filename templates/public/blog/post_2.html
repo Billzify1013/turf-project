@@ -1,0 +1,191 @@
+{% extends 'public/_base.html' %}
+{% block title %}Dynamic Pricing for Turf Facilities — Maximize Revenue with Smart Rates | TurfSys{% endblock %}
+
+{% block extra_css %}
+.article-hero { padding: 100px 24px 30px; max-width: 800px; margin: 0 auto; }
+.breadcrumb { font-size: 13px; color: var(--text3); margin-bottom: 18px; }
+.breadcrumb a { color: var(--primary); text-decoration: none; }
+.article-cat { display: inline-block; background: var(--primary-light); color: var(--primary-dark); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 16px; }
+.article-title { font-size: clamp(1.8rem, 4.5vw, 2.6rem); font-weight: 800; letter-spacing: -.8px; line-height: 1.2; margin-bottom: 18px; }
+.article-meta { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--text3); padding-bottom: 22px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+.article-meta span { display: flex; align-items: center; gap: 5px; }
+.article-meta strong { color: var(--text); }
+.article-cover { background: linear-gradient(135deg, var(--primary-light), #f0fdf4); height: 280px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 8rem; margin-bottom: 36px; border: 1px solid #bbf7d0; }
+.article-body { max-width: 760px; margin: 0 auto; padding: 0 24px 60px; }
+.article-body h2 { font-size: 1.7rem; font-weight: 800; letter-spacing: -.5px; margin: 40px 0 16px; }
+.article-body h3 { font-size: 1.25rem; font-weight: 700; margin: 32px 0 12px; }
+.article-body p { font-size: 16px; line-height: 1.75; margin-bottom: 18px; }
+.article-body ul, .article-body ol { margin: 14px 0 22px 24px; }
+.article-body li { font-size: 16px; line-height: 1.75; margin-bottom: 8px; }
+.article-body strong { font-weight: 700; }
+.article-body table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+.article-body th, .article-body td { padding: 12px 14px; border: 1px solid var(--border); text-align: left; }
+.article-body th { background: var(--bg-soft); font-weight: 700; }
+.callout { background: linear-gradient(135deg, var(--primary-light), #f0fdf4); border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px 24px; margin: 28px 0; }
+.callout h4 { font-size: 15px; font-weight: 800; margin-bottom: 6px; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+.callout p { margin: 0; font-size: 14.5px; }
+.article-cta { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 16px; padding: 32px; text-align: center; margin: 40px 0; }
+.article-cta h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+.article-cta p { opacity: .92; margin-bottom: 18px; font-size: 14.5px; }
+{% endblock %}
+
+{% block content %}
+<section class="article-hero">
+  <div class="breadcrumb">
+    <a href="{% url 'landing' %}">Home</a> / <a href="{% url 'blog_list' %}">Blog</a> / <span>Pricing Strategy</span>
+  </div>
+  <div class="article-cat">Pricing Strategy</div>
+  <h1 class="article-title">Dynamic Pricing for Turf Facilities — Maximize Revenue with Smart Rates</h1>
+  <div class="article-meta">
+    <span><i class="bi bi-person-circle"></i> <strong>TurfSys Editorial Team</strong></span>
+    <span><i class="bi bi-calendar"></i> May 2026</span>
+    <span><i class="bi bi-clock"></i> 8 min read</span>
+  </div>
+</section>
+
+<div style="max-width:800px; margin:0 auto; padding:0 24px;">
+  <div class="article-cover">💰</div>
+</div>
+
+<article class="article-body">
+
+  <p>If you charge the same hourly rate at 7 AM as you do at 8 PM on a Saturday, you are leaving significant revenue on the table — possibly 30-40% of your potential earnings. Dynamic pricing is one of the most powerful, and most overlooked, levers in turf business profitability.</p>
+
+  <p>This guide breaks down exactly how to implement dynamic pricing in a way that maximizes revenue without alienating your loyal customers.</p>
+
+  <h2>What is Dynamic Pricing?</h2>
+
+  <p>Dynamic pricing means charging different rates based on demand factors — time of day, day of the week, season, or special events. Hotels, airlines, and ride-sharing apps have used dynamic pricing for decades. Turf facilities are now starting to apply the same principles.</p>
+
+  <p>The economic logic is simple: when demand exceeds supply (peak evenings), you should charge a premium. When supply exceeds demand (weekday mornings), you should incentivize bookings with discounted rates.</p>
+
+  <h2>The 4 Pricing Tiers Every Turf Should Have</h2>
+
+  <h3>1. Off-peak rate (40-60% of base)</h3>
+
+  <p>Apply to typically empty slots — weekday mornings (6 AM – 11 AM) and early afternoons (11 AM – 4 PM). The goal here isn't profit per hour — it's filling slots that would otherwise sit empty. Even at 50% rate, an off-peak booking adds revenue you wouldn't have made.</p>
+
+  <h3>2. Standard rate (base price)</h3>
+
+  <p>Weekday late afternoons (4 PM – 6 PM) and weekend mornings. Demand is moderate, so charge your normal rate.</p>
+
+  <h3>3. Peak rate (1x, sometimes called "prime time")</h3>
+
+  <p>Weekday evenings (6 PM – 10 PM). This is your bread and butter — most bookings happen here. Don't undercharge.</p>
+
+  <h3>4. Premium rate (1.3x – 1.5x base)</h3>
+
+  <p>Weekend evenings (Friday 6 PM through Sunday 10 PM). Demand peaks, supply is fixed. Customers will pay 30-50% more.</p>
+
+  <div class="callout">
+    <h4>📊 Real example</h4>
+    <p>If your base rate is $20/hour, your weekend evening rate should be $26-30/hour. A facility booking 6 weekend evening hours daily generates an additional $36-60 daily — over $1,000 monthly with no extra effort.</p>
+  </div>
+
+  <h2>Pricing Models Compared</h2>
+
+  <table>
+    <tr>
+      <th>Model</th>
+      <th>Pros</th>
+      <th>Cons</th>
+    </tr>
+    <tr>
+      <td><strong>Flat rate</strong></td>
+      <td>Simple, easy to explain</td>
+      <td>Leaves money on the table; doesn't fill off-peak</td>
+    </tr>
+    <tr>
+      <td><strong>2-tier (peak/off-peak)</strong></td>
+      <td>Easy to manage; captures basic demand variation</td>
+      <td>Misses weekend premium opportunity</td>
+    </tr>
+    <tr>
+      <td><strong>4-tier dynamic</strong></td>
+      <td>Maximizes revenue; fills off-peak slots</td>
+      <td>Slightly more complex; needs good software</td>
+    </tr>
+    <tr>
+      <td><strong>Surge pricing</strong></td>
+      <td>Captures maximum value during events</td>
+      <td>Risk of customer backlash if poorly communicated</td>
+    </tr>
+  </table>
+
+  <h2>Special Pricing Strategies</h2>
+
+  <h3>Holiday & event surge</h3>
+
+  <p>National holidays, major sports finals, and local festivals see massive spikes in turf demand. A 2x rate is reasonable on these days. Just communicate the rate clearly in advance.</p>
+
+  <h3>Membership pricing</h3>
+
+  <p>Offer monthly/quarterly passes with a fixed number of hours at a discounted rate. This guarantees recurring revenue and creates customer loyalty. Typical structures:</p>
+  <ul>
+    <li>10 hours/month at 15% discount</li>
+    <li>20 hours/month at 25% discount</li>
+    <li>Unlimited weekday mornings at fixed monthly fee</li>
+  </ul>
+
+  <h3>Group/corporate rates</h3>
+
+  <p>Companies booking team-building activities are price-insensitive but value reliability. Charge a premium and offer added services (referees, refreshments, jerseys).</p>
+
+  <h3>Last-minute discounts</h3>
+
+  <p>If a peak slot is unbooked 2 hours before, send a 30% discount notification to your customer list. Better to fill at $14 than lose $20 entirely.</p>
+
+  <h2>How to Communicate Pricing to Customers</h2>
+
+  <p>Customers don't dislike dynamic pricing — they dislike surprise pricing. The key is transparency:</p>
+
+  <ul>
+    <li>Display all pricing tiers prominently on your booking page</li>
+    <li>Show "Save 40% — book before 5 PM!" type messages on booking interfaces</li>
+    <li>Avoid changing prices for already-confirmed bookings</li>
+    <li>Frame premium rates positively: "Weekend prime time" sounds better than "surge pricing"</li>
+  </ul>
+
+  <h2>Avoiding Common Pitfalls</h2>
+
+  <ol>
+    <li><strong>Don't price too aggressively at launch.</strong> Establish customer base first, then introduce dynamic rates after 3-6 months</li>
+    <li><strong>Don't change rates frequently.</strong> Stable predictable pricing builds trust</li>
+    <li><strong>Honor advertised rates.</strong> If a customer sees $20 at booking time, never charge them more</li>
+    <li><strong>Test off-peak pricing carefully.</strong> Aggressive discounts can attract price-sensitive customers who don't return at full rates</li>
+  </ol>
+
+  <h2>The Software Factor</h2>
+
+  <p>Implementing dynamic pricing manually is a nightmare. Spreadsheets break, staff make mistakes, and customers get frustrated. Modern turf management software handles dynamic pricing automatically — applying the right rate based on date, time, and rules you set once.</p>
+
+  <div class="callout">
+    <h4>⚙️ Practical implementation</h4>
+    <p>TurfSys lets you set up unlimited pricing rules — fixed prices or multipliers, by day of week, specific dates, or time ranges. The system applies the correct rate to every booking automatically.</p>
+  </div>
+
+  <h2>Expected Revenue Impact</h2>
+
+  <p>Based on industry data from facilities that have transitioned from flat to dynamic pricing:</p>
+
+  <ul>
+    <li><strong>Flat rate facilities:</strong> baseline revenue (100%)</li>
+    <li><strong>2-tier pricing:</strong> 110-120% of baseline</li>
+    <li><strong>4-tier dynamic pricing:</strong> 130-145% of baseline</li>
+    <li><strong>Dynamic + memberships + last-minute deals:</strong> 145-170% of baseline</li>
+  </ul>
+
+  <h2>Conclusion</h2>
+
+  <p>Dynamic pricing is not about extracting more from customers — it's about charging the right price for the value of each time slot. Done correctly, it creates a win-win: customers who want premium time slots pay for that convenience, while price-sensitive customers find affordable options during off-peak hours.</p>
+
+  <p>The facilities that resist dynamic pricing aren't being customer-friendly — they're simply leaving 30-40% of their potential revenue uncaptured. In a competitive turf market, that gap can determine which facilities survive and which don't.</p>
+
+  <div class="article-cta">
+    <h3>Set up dynamic pricing in 5 minutes</h3>
+    <p>TurfSys handles unlimited pricing rules, weekend premiums, holiday surcharges — all automated.</p>
+    <a href="{% url 'register' %}" class="btn btn-white btn-lg">Try Free</a>
+  </div>
+
+</article>
+{% endblock %}

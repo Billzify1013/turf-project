@@ -45,6 +45,12 @@ urlpatterns = [
 
 
     path('robots.txt', views.robots_txt, name='robots_txt'),
+    path('blog/', views.blog_list, name='blog_list'),
+    path('blog/how-to-start-turf-business/', views.blog_post_1, name='blog_post_1'),
+    path('blog/turf-pricing-strategy/', views.blog_post_2, name='blog_post_2'),
+    path('blog/increase-turf-bookings/', views.blog_post_3, name='blog_post_3'),
+    path('blog/turf-management-software-guide/', views.blog_post_4, name='blog_post_4'),
+    path('blog/turf-marketing-tips/', views.blog_post_5, name='blog_post_5'),
 ]
 
 
